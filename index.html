@@ -76,12 +76,14 @@
             font-family: 'Outfit', sans-serif;
         }
 
+        /* Glassmorphism Nav */
         .glass-nav {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
         }
 
+        /* Card hover effects */
         .deal-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -100,6 +102,7 @@
             backdrop-filter: blur(6px);
         }
 
+        /* Scroll animations */
         .fade-up {
             opacity: 0;
             transform: translateY(30px);
@@ -111,10 +114,12 @@
             transform: translateY(0);
         }
 
+        /* Hero gradient overlay */
         .hero-gradient {
             background: linear-gradient(135deg, rgba(21, 77, 222, 0.5) 0%, rgba(25, 57, 142, 0.3) 50%, rgba(0, 0, 0, 0.2) 100%);
         }
 
+        /* Shimmer loading */
         .shimmer {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
@@ -131,6 +136,7 @@
             }
         }
 
+        /* Pulse dot */
         .pulse-dot {
             animation: pulse 2s infinite;
         }
@@ -147,6 +153,7 @@
             }
         }
 
+        /* Mobile menu */
         .mobile-menu {
             transform: translateX(100%);
             transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -167,19 +174,62 @@
             pointer-events: auto;
         }
 
+        /* City autocomplete */
         .autocomplete-list {
             max-height: 200px;
             overflow-y: auto;
+            z-index: 9999;
+            position: absolute;
         }
 
         .autocomplete-list div:hover {
             background: #eef6ff;
         }
 
+        /* Trip type toggle */
+        .trip-toggle {
+            transition: all 0.25s ease;
+        }
+
+        .trip-toggle.active {
+            background: #154dde;
+            color: white;
+            box-shadow: 0 2px 8px rgba(21, 77, 222, 0.3);
+        }
+
+        .trip-toggle:not(.active) {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .trip-toggle:not(.active):hover {
+            background: #e2e8f0;
+        }
+
+        /* Date inputs */
+        input[type="date"] {
+            color-scheme: light;
+        }
+
+        .date-field {
+            transition: opacity 0.3s ease, max-width 0.3s ease;
+        }
+
+        .date-field.hidden-date {
+            opacity: 0;
+            max-width: 0;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            border: 0;
+        }
+
+        /* Smooth scroll */
         html {
             scroll-behavior: smooth;
         }
 
+        /* Footer gradient */
         .footer-gradient {
             background: linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
         }
@@ -188,10 +238,10 @@
 
 <body class="bg-gray-50 text-gray-800 antialiased">
 
-    <!-- Mobile menu overlay -->
+    <!-- Мобильное меню overlay -->
     <div id="mobileOverlay" class="mobile-overlay fixed inset-0 bg-black/40 z-[90]" onclick="closeMobileMenu()"></div>
 
-    <!-- Mobile menu -->
+    <!-- Мобильное меню -->
     <div id="mobileMenu"
         class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white z-[100] shadow-2xl p-8 flex flex-col">
         <div class="flex justify-between items-center mb-10">
@@ -220,7 +270,7 @@
         </div>
     </div>
 
-    <!-- Navigation -->
+    <!-- Навигация -->
     <nav class="glass-nav border-b border-gray-100/80 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 lg:h-20 items-center">
@@ -256,7 +306,7 @@
     </nav>
 
     <!-- Hero -->
-    <header class="relative min-h-[480px] lg:min-h-[520px] flex items-center justify-center overflow-hidden">
+    <header class="relative min-h-[480px] lg:min-h-[520px] flex items-center justify-center">
         <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2000"
             alt="Путешествие" class="absolute inset-0 w-full h-full object-cover">
         <div class="absolute inset-0 hero-gradient"></div>
@@ -272,43 +322,74 @@
                 Мы находим самые выгодные рейсы среди сотен авиакомпаний
             </p>
 
-            <!-- Search form -->
-            <div id="searchForm"
-                class="bg-white p-2 rounded-2xl shadow-2xl shadow-black/20 flex flex-col md:flex-row items-stretch gap-2 max-w-3xl mx-auto">
-                <div class="relative flex-1 w-full">
-                    <div class="flex items-center gap-2 px-4 text-gray-800">
-                        <i data-lucide="plane-takeoff" class="w-5 h-5 text-gray-400 shrink-0"></i>
-                        <input id="inputFrom" type="text" placeholder="Откуда (город)" autocomplete="off"
-                            class="w-full py-3 bg-transparent outline-none text-sm font-medium"
-                            onfocus="showAutocomplete('from')" oninput="filterCities('from')">
-                    </div>
-                    <div id="autocompleteFrom"
-                        class="autocomplete-list hidden absolute top-full left-0 right-0 bg-white rounded-xl shadow-xl border border-gray-100 mt-1 py-1 z-50">
-                    </div>
+            <!-- Форма поиска -->
+            <div id="searchForm" class="bg-white p-3 sm:p-4 rounded-2xl shadow-2xl shadow-black/20 max-w-4xl mx-auto">
+                <!-- Переключатель Туда-обратно / В одну сторону -->
+                <div class="flex items-center gap-2 mb-3">
+                    <button id="btnRoundTrip" onclick="toggleTripType('roundtrip')"
+                        class="trip-toggle active px-4 py-1.5 rounded-full text-xs font-bold">
+                        Туда-обратно
+                    </button>
+                    <button id="btnOneWay" onclick="toggleTripType('oneway')"
+                        class="trip-toggle px-4 py-1.5 rounded-full text-xs font-bold">
+                        В одну сторону
+                    </button>
                 </div>
-                <div class="hidden md:block w-px bg-gray-200"></div>
-                <div class="relative flex-1 w-full">
-                    <div class="flex items-center gap-2 px-4 text-gray-800">
-                        <i data-lucide="plane-landing" class="w-5 h-5 text-gray-400 shrink-0"></i>
-                        <input id="inputTo" type="text" placeholder="Куда (город)" autocomplete="off"
-                            class="w-full py-3 bg-transparent outline-none text-sm font-medium"
-                            onfocus="showAutocomplete('to')" oninput="filterCities('to')">
+                <!-- Поля ввода -->
+                <div class="flex flex-col md:flex-row items-stretch gap-2">
+                    <!-- Откуда -->
+                    <div class="relative flex-1 w-full">
+                        <div class="flex items-center gap-2 px-4 text-gray-800 bg-gray-50 rounded-xl">
+                            <i data-lucide="plane-takeoff" class="w-5 h-5 text-gray-400 shrink-0"></i>
+                            <input id="inputFrom" type="text" placeholder="Откуда" autocomplete="off"
+                                class="w-full py-3 bg-transparent outline-none text-sm font-medium"
+                                onfocus="showAutocomplete('from')" oninput="filterCities('from')">
+                        </div>
+                        <div id="autocompleteFrom"
+                            class="autocomplete-list hidden top-full left-0 right-0 bg-white rounded-xl shadow-xl border border-gray-100 mt-1 py-1">
+                        </div>
                     </div>
-                    <div id="autocompleteTo"
-                        class="autocomplete-list hidden absolute top-full left-0 right-0 bg-white rounded-xl shadow-xl border border-gray-100 mt-1 py-1 z-50">
+                    <!-- Куда -->
+                    <div class="relative flex-1 w-full">
+                        <div class="flex items-center gap-2 px-4 text-gray-800 bg-gray-50 rounded-xl">
+                            <i data-lucide="plane-landing" class="w-5 h-5 text-gray-400 shrink-0"></i>
+                            <input id="inputTo" type="text" placeholder="Куда" autocomplete="off"
+                                class="w-full py-3 bg-transparent outline-none text-sm font-medium"
+                                onfocus="showAutocomplete('to')" oninput="filterCities('to')">
+                        </div>
+                        <div id="autocompleteTo"
+                            class="autocomplete-list hidden top-full left-0 right-0 bg-white rounded-xl shadow-xl border border-gray-100 mt-1 py-1">
+                        </div>
                     </div>
+                    <!-- Дата вылета -->
+                    <div class="relative w-full md:w-40">
+                        <div class="flex items-center gap-2 px-4 text-gray-800 bg-gray-50 rounded-xl">
+                            <i data-lucide="calendar" class="w-5 h-5 text-gray-400 shrink-0"></i>
+                            <input id="inputDateDepart" type="date" title="Дата вылета"
+                                class="w-full py-3 bg-transparent outline-none text-sm font-medium cursor-pointer">
+                        </div>
+                    </div>
+                    <!-- Дата прилёта (только Туда-обратно) -->
+                    <div id="returnDateField" class="date-field relative w-full md:w-40">
+                        <div class="flex items-center gap-2 px-4 text-gray-800 bg-gray-50 rounded-xl">
+                            <i data-lucide="calendar-check" class="w-5 h-5 text-gray-400 shrink-0"></i>
+                            <input id="inputDateReturn" type="date" title="Дата возврата"
+                                class="w-full py-3 bg-transparent outline-none text-sm font-medium cursor-pointer">
+                        </div>
+                    </div>
+                    <!-- Кнопка -->
+                    <button onclick="searchFlights()"
+                        class="w-full md:w-auto bg-gradient-to-r from-accent-500 to-accent-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-accent-500/30 transition-all text-sm flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i data-lucide="search" class="w-4 h-4"></i> Найти
+                    </button>
                 </div>
-                <button onclick="searchFlights()"
-                    class="w-full md:w-auto bg-gradient-to-r from-accent-500 to-accent-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-accent-500/30 transition-all text-sm flex items-center justify-center gap-2">
-                    <i data-lucide="search" class="w-4 h-4"></i> Найти
-                </button>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
 
-        <!-- Hot deals -->
+        <!-- Горящие предложения -->
         <section id="hot-deals" class="mb-20 fade-up">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
                 <div>
@@ -330,6 +411,7 @@
             </div>
 
             <div id="dealsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- Loading shimmer -->
                 <div class="shimmer rounded-2xl h-48"></div>
                 <div class="shimmer rounded-2xl h-48"></div>
                 <div class="shimmer rounded-2xl h-48"></div>
@@ -337,7 +419,7 @@
             </div>
         </section>
 
-        <!-- Guides -->
+        <!-- Путеводители -->
         <section id="guides" class="mb-20 fade-up">
             <div class="flex items-end justify-between mb-8">
                 <div>
@@ -351,7 +433,7 @@
                 </div>
             </div>
             <div id="destinations" class="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
-                <!-- Istanbul -->
+                <!-- Стамбул -->
                 <article
                     class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
                     <div class="relative h-56 overflow-hidden">
@@ -379,7 +461,7 @@
                     </div>
                 </article>
 
-                <!-- Bali -->
+                <!-- Бали -->
                 <article
                     class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
                     <div class="relative h-56 overflow-hidden">
@@ -407,7 +489,7 @@
                     </div>
                 </article>
 
-                <!-- Georgia -->
+                <!-- Грузия -->
                 <article
                     class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
                     <div class="relative h-56 overflow-hidden">
@@ -435,7 +517,7 @@
                     </div>
                 </article>
 
-                <!-- Thailand -->
+                <!-- Таиланд -->
                 <article
                     class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
                     <div class="relative h-56 overflow-hidden">
@@ -463,7 +545,7 @@
                     </div>
                 </article>
 
-                <!-- Montenegro -->
+                <!-- Черногория -->
                 <article
                     class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
                     <div class="relative h-56 overflow-hidden">
@@ -491,7 +573,7 @@
                     </div>
                 </article>
 
-                <!-- Dubai -->
+                <!-- Дубай -->
                 <article
                     class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
                     <div class="relative h-56 overflow-hidden">
@@ -566,16 +648,18 @@
     </footer>
 
     <script>
-        // ===== CONFIG =====
+        // ===== КОНФИГУРАЦИЯ =====
         const CONFIG = {
+            // Вставьте ваш Travelpayouts API токен сюда:
             API_TOKEN: '33455759bbacefe8bc09110cb398bbd9',
             API_BASE: 'https://api.travelpayouts.com',
-            MARKER: '703570',
+            MARKER: '703570', // Ваш партнёрский маркер
             CURRENCY: 'rub',
         };
 
-        // ===== IATA city codes =====
+        // ===== IATA-коды городов =====
         const CITIES = [
+            // Россия
             { name: 'Москва', code: 'MOW' },
             { name: 'Санкт-Петербург', code: 'LED' },
             { name: 'Казань', code: 'KZN' },
@@ -587,32 +671,138 @@
             { name: 'Самара', code: 'KUF' },
             { name: 'Уфа', code: 'UFA' },
             { name: 'Калининград', code: 'KGD' },
+            { name: 'Владивосток', code: 'VVO' },
+            { name: 'Хабаровск', code: 'KHV' },
+            { name: 'Иркутск', code: 'IKT' },
+            { name: 'Красноярск', code: 'KJA' },
+            { name: 'Тюмень', code: 'TJM' },
+            { name: 'Пермь', code: 'PEE' },
+            { name: 'Воронеж', code: 'VOZ' },
+            { name: 'Волгоград', code: 'VOG' },
+            { name: 'Нижний Новгород', code: 'GOJ' },
+            { name: 'Челябинск', code: 'CEK' },
+            { name: 'Омск', code: 'OMS' },
+            { name: 'Томск', code: 'TOF' },
+            { name: 'Барнаул', code: 'BAX' },
+            { name: 'Якутск', code: 'YKS' },
+            { name: 'Мурманск', code: 'MMK' },
+            { name: 'Архангельск', code: 'ARH' },
+            { name: 'Махачкала', code: 'MCX' },
+            { name: 'Минеральные Воды', code: 'MRV' },
+            { name: 'Сургут', code: 'SGC' },
+            { name: 'Южно-Сахалинск', code: 'UUS' },
+            { name: 'Петропавловск-Камчатский', code: 'PKC' },
+            // Турция
             { name: 'Стамбул', code: 'IST' },
             { name: 'Анталья', code: 'AYT' },
+            // ОАЭ
             { name: 'Дубай', code: 'DXB' },
+            // Юго-Восточная Азия
             { name: 'Бангкок', code: 'BKK' },
             { name: 'Пхукет', code: 'HKT' },
             { name: 'Бали', code: 'DPS' },
+            { name: 'Ханой', code: 'HAN' },
+            { name: 'Куала-Лумпур', code: 'KUL' },
+            { name: 'Сингапур', code: 'SIN' },
+            // Кавказ
             { name: 'Тбилиси', code: 'TBS' },
             { name: 'Батуми', code: 'BUS' },
             { name: 'Ереван', code: 'EVN' },
+            // СНГ
             { name: 'Минск', code: 'MSQ' },
             { name: 'Ташкент', code: 'TAS' },
+            { name: 'Алматы', code: 'ALA' },
+            { name: 'Бишкек', code: 'FRU' },
+            // Египет
             { name: 'Хургада', code: 'HRG' },
             { name: 'Шарм-эль-Шейх', code: 'SSH' },
+            { name: 'Каир', code: 'CAI' },
+            // Балканы
             { name: 'Тиват', code: 'TIV' },
             { name: 'Белград', code: 'BEG' },
+            // Южная Азия
+            { name: 'Мале', code: 'MLE' },
+            { name: 'Коломбо', code: 'CMB' },
+            { name: 'Гоа', code: 'GOI' },
+            { name: 'Дели', code: 'DEL' },
+            // Восточная Азия
+            { name: 'Пекин', code: 'PEK' },
+            { name: 'Сеул', code: 'ICN' },
+            { name: 'Токио', code: 'NRT' },
+            // Европа
+            { name: 'Париж', code: 'CDG' },
+            { name: 'Лондон', code: 'LHR' },
+            { name: 'Рим', code: 'FCO' },
+            { name: 'Барселона', code: 'BCN' },
+            { name: 'Прага', code: 'PRG' },
+            { name: 'Будапешт', code: 'BUD' },
         ];
 
         let selectedFrom = null;
         let selectedTo = null;
+        let tripType = 'roundtrip'; // 'roundtrip' или 'oneway'
 
-        // ===== FLIGHT SEARCH =====
+        // ===== ПЕРЕКЛЮЧАТЕЛЬ ТУДА-ОБРАТНО =====
+        function toggleTripType(type) {
+            tripType = type;
+            const btnRound = document.getElementById('btnRoundTrip');
+            const btnOne = document.getElementById('btnOneWay');
+            const returnField = document.getElementById('returnDateField');
+
+            if (type === 'roundtrip') {
+                btnRound.classList.add('active');
+                btnOne.classList.remove('active');
+                returnField.classList.remove('hidden-date');
+            } else {
+                btnOne.classList.add('active');
+                btnRound.classList.remove('active');
+                returnField.classList.add('hidden-date');
+            }
+        }
+
+        // Установить минимальные даты (сегодня)
+        function initDates() {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            const weekLater = new Date(today);
+            weekLater.setDate(weekLater.getDate() + 7);
+            const weekStr = weekLater.toISOString().split('T')[0];
+
+            const departInput = document.getElementById('inputDateDepart');
+            const returnInput = document.getElementById('inputDateReturn');
+
+            departInput.min = todayStr;
+            departInput.value = todayStr;
+            returnInput.min = todayStr;
+            returnInput.value = weekStr;
+
+            // Обновлять мин. дату возврата при смене даты вылета
+            departInput.addEventListener('change', () => {
+                returnInput.min = departInput.value;
+                if (returnInput.value < departInput.value) {
+                    returnInput.value = departInput.value;
+                }
+            });
+        }
+
+        // Формат даты для Aviasales: DDMM
+        function formatDateForAviasales(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            return day + month;
+        }
+
+        // ===== ПОИСК БИЛЕТОВ =====
         function searchFlights() {
             const fromCode = selectedFrom ? selectedFrom.code : '';
             const toCode = selectedTo ? selectedTo.code : '';
+            const departDate = document.getElementById('inputDateDepart').value;
+            const returnDate = document.getElementById('inputDateReturn').value;
 
             if (!fromCode || !toCode) {
+                // Подсветить пустые поля
                 if (!fromCode) document.getElementById('inputFrom').style.boxShadow = '0 0 0 2px #f97316';
                 if (!toCode) document.getElementById('inputTo').style.boxShadow = '0 0 0 2px #f97316';
                 setTimeout(() => {
@@ -622,11 +812,20 @@
                 return;
             }
 
-            const url = `https://www.aviasales.ru/search/${fromCode}${toCode}1?marker=${CONFIG.MARKER}`;
+            // Формируем URL Aviasales с датами
+            const departStr = formatDateForAviasales(departDate);
+            let searchPath = `${fromCode}${departStr}${toCode}`;
+
+            if (tripType === 'roundtrip' && returnDate) {
+                const returnStr = formatDateForAviasales(returnDate);
+                searchPath += returnStr;
+            }
+
+            const url = `https://www.aviasales.ru/search/${searchPath}1?marker=${CONFIG.MARKER}`;
             window.open(url, '_blank');
         }
 
-        // ===== CITY AUTOCOMPLETE =====
+        // ===== АВТОКОМПЛИТ ГОРОДОВ =====
         function showAutocomplete(type) {
             const listId = type === 'from' ? 'autocompleteFrom' : 'autocompleteTo';
             const inputId = type === 'from' ? 'inputFrom' : 'inputTo';
@@ -667,6 +866,7 @@
             }
         }
 
+        // Закрыть автокомплит при клике вне
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#searchForm')) {
                 document.getElementById('autocompleteFrom').classList.add('hidden');
@@ -674,7 +874,7 @@
             }
         });
 
-        // ===== HOT DEALS — API =====
+        // ===== ГОРЯЩИЕ ПРЕДЛОЖЕНИЯ — API =====
         const FALLBACK_DEALS = [
             { origin: 'MOW', origin_name: 'Москва', destination: 'IST', destination_name: 'Стамбул', price: 12500, trip: 'Туда-обратно' },
             { origin: 'LED', origin_name: 'СПб', destination: 'HKT', destination_name: 'Пхукет', price: 45200, trip: 'Туда-обратно, 1 пересадка' },
@@ -686,14 +886,18 @@
             { origin: 'SVX', origin_name: 'Екатеринбург', destination: 'TIV', destination_name: 'Тиват', price: 27400, trip: 'Туда-обратно' },
         ];
 
+        // Маппинг IATA → название города
         const CITY_NAMES = {};
         CITIES.forEach(c => CITY_NAMES[c.code] = c.name);
 
         async function loadHotDeals() {
             const grid = document.getElementById('dealsGrid');
+
+            // Показать shimmer
             grid.innerHTML = Array(8).fill('<div class="shimmer rounded-2xl h-48"></div>').join('');
 
             if (CONFIG.API_TOKEN === 'YOUR_TOKEN_HERE') {
+                // Нет токена — показать fallback
                 setTimeout(() => renderDeals(FALLBACK_DEALS), 600);
                 return;
             }
@@ -722,7 +926,7 @@
                     renderDeals(FALLBACK_DEALS);
                 }
             } catch (err) {
-                console.warn('API unavailable, showing fallback data:', err);
+                console.warn('API недоступен, показываем примерные данные:', err);
                 renderDeals(FALLBACK_DEALS);
             }
         }
@@ -747,10 +951,11 @@
                 </div>
             `).join('');
 
+            // Переинициализировать Lucide иконки
             lucide.createIcons();
         }
 
-        // ===== MOBILE MENU =====
+        // ===== МОБИЛЬНОЕ МЕНЮ =====
         function openMobileMenu() {
             document.getElementById('mobileMenu').classList.add('open');
             document.getElementById('mobileOverlay').classList.add('open');
@@ -763,7 +968,7 @@
             document.body.style.overflow = '';
         }
 
-        // ===== SCROLL ANIMATIONS =====
+        // ===== АНИМАЦИИ ПРИ СКРОЛЛЕ =====
         const fadeObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -774,8 +979,9 @@
 
         document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
 
-        // ===== INIT =====
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
         lucide.createIcons();
+        initDates();
         loadHotDeals();
 
         console.log('VoyogeStories Engine v1.0 — Initialized ✈️');
