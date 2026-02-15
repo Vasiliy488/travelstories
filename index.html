@@ -46,6 +46,7 @@
                             400: '#fb923c',
                             500: '#f97316',
                             600: '#ea580c',
+                            49: '#fbbf24',
                         }
                     }
                 }
@@ -825,68 +826,58 @@
             window.open(url, '_blank');
         }
 
-        // ===== АВТОКОМПЛИТ ГОРОДОВ =====
+        // ===== АВТОЗАПОЛНЕНИЕ =====
         function showAutocomplete(type) {
-            const listId = type === 'from' ? 'autocompleteFrom' : 'autocompleteTo';
-            const inputId = type === 'from' ? 'inputFrom' : 'inputTo';
-            const list = document.getElementById(listId);
-            const query = document.getElementById(inputId).value.toLowerCase();
-
-            const filtered = query
-                ? CITIES.filter(c => c.name.toLowerCase().includes(query))
-                : CITIES.slice(0, 10);
-
-            renderAutocomplete(list, filtered, type);
+            const list = document.getElementById(type === 'from' ? 'autocompleteFrom' : 'autocompleteTo');
             list.classList.remove('hidden');
+            renderCityList(CITIES, type);
         }
 
-        function filterCities(type) {
-            showAutocomplete(type);
+        function hideAutocomplete() {
+            document.querySelectorAll('.autocomplete-list').forEach(el => el.classList.add('hidden'));
         }
 
-        function renderAutocomplete(list, cities, type) {
-            list.innerHTML = cities.map(city => `
-                <div class="px-4 py-2.5 cursor-pointer text-left text-sm text-gray-700 font-medium flex justify-between items-center transition"
-                     onclick="selectCity('${type}', '${city.name}', '${city.code}')">
-                    <span>${city.name}</span>
-                    <span class="text-xs text-gray-400 font-mono">${city.code}</span>
-                </div>
-            `).join('');
-        }
-
-        function selectCity(type, name, code) {
-            if (type === 'from') {
-                selectedFrom = { name, code };
-                document.getElementById('inputFrom').value = name;
-                document.getElementById('autocompleteFrom').classList.add('hidden');
-            } else {
-                selectedTo = { name, code };
-                document.getElementById('inputTo').value = name;
-                document.getElementById('autocompleteTo').classList.add('hidden');
-            }
-        }
-
-        // Закрыть автокомплит при клике вне
+        // Клик вне списка закрывает его
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('#searchForm')) {
-                document.getElementById('autocompleteFrom').classList.add('hidden');
-                document.getElementById('autocompleteTo').classList.add('hidden');
-            }
+            if (!e.target.closest('.relative')) hideAutocomplete();
         });
 
-        // ===== ГОРЯЩИЕ ПРЕДЛОЖЕНИЯ — API =====
-        const FALLBACK_DEALS = [
-            { origin: 'MOW', origin_name: 'Москва', destination: 'IST', destination_name: 'Стамбул', price: 12500, trip: 'Туда-обратно' },
-            { origin: 'LED', origin_name: 'СПб', destination: 'HKT', destination_name: 'Пхукет', price: 45200, trip: 'Туда-обратно, 1 пересадка' },
-            { origin: 'MOW', origin_name: 'Москва', destination: 'AER', destination_name: 'Сочи', price: 8900, trip: 'В одну сторону' },
-            { origin: 'KZN', origin_name: 'Казань', destination: 'DXB', destination_name: 'Дубай', price: 31000, trip: 'Туда-обратно' },
-            { origin: 'MOW', origin_name: 'Москва', destination: 'TBS', destination_name: 'Тбилиси', price: 14800, trip: 'Туда-обратно' },
-            { origin: 'LED', origin_name: 'СПб', destination: 'AYT', destination_name: 'Анталья', price: 18500, trip: 'Туда-обратно' },
-            { origin: 'MOW', origin_name: 'Москва', destination: 'BKK', destination_name: 'Бангкок', price: 35600, trip: 'Туда-обратно, 1 пересадка' },
-            { origin: 'SVX', origin_name: 'Екатеринбург', destination: 'TIV', destination_name: 'Тиват', price: 27400, trip: 'Туда-обратно' },
-        ];
+        function filterCities(type) {
+            const input = document.getElementById(type === 'from' ? 'inputFrom' : 'inputTo');
+            const query = input.value.toLowerCase();
+            const filtered = CITIES.filter(c =>
+                c.name.toLowerCase().includes(query) || c.code.toLowerCase().includes(query)
+            );
+            renderCityList(filtered, type);
+        }
 
-        // Маппинг IATA → название города
+        function renderCityList(cities, type) {
+            const list = document.getElementById(type === 'from' ? 'autocompleteFrom' : 'autocompleteTo');
+            list.innerHTML = '';
+
+            if (cities.length === 0) {
+                list.innerHTML = '<div class="p-3 text-sm text-gray-500 text-center">Ничего не найдено</div>';
+                return;
+            }
+
+            cities.forEach(city => {
+                const item = document.createElement('div');
+                item.className = 'px-4 py-2.5 cursor-pointer text-sm text-gray-700 flex justify-between hover:bg-brand-50 transition';
+                item.innerHTML = `<span>${city.name}</span> <span class="text-gray-400 font-mono text-xs">${city.code}</span>`;
+                item.onclick = () => selectCity(city, type);
+                list.appendChild(item);
+            });
+        }
+
+        function selectCity(city, type) {
+            const input = document.getElementById(type === 'from' ? 'inputFrom' : 'inputTo');
+            input.value = city.name; // Показываем имя города
+            if (type === 'from') selectedFrom = city;
+            else selectedTo = city;
+            hideAutocomplete();
+        }
+
+        // ===== ГОРЯЩИЕ ЦЕНЫ (API) =====
         const CITY_NAMES = {};
         CITIES.forEach(c => CITY_NAMES[c.code] = c.name);
 
@@ -897,7 +888,7 @@
             grid.innerHTML = Array(8).fill('<div class="shimmer rounded-2xl h-48"></div>').join('');
 
             // Token check removed - handled by Worker
-            
+
             try {
                 const response = await fetch(
                     `${CONFIG.API_BASE}/v2/prices/latest?currency=${CONFIG.CURRENCY}&period_type=year&page=1&limit=8&sorting=price&trip_class=0`
@@ -916,6 +907,8 @@
                         destination_name: CITY_NAMES[d.destination] || d.destination,
                         price: d.value,
                         trip: d.return_date ? 'Туда-обратно' : 'В одну сторону',
+                        depart_date: d.depart_date,
+                        return_date: d.return_date,
                     }));
                     renderDeals(deals);
                 } else {
@@ -929,7 +922,12 @@
 
         function renderDeals(deals) {
             const grid = document.getElementById('dealsGrid');
-            grid.innerHTML = deals.map(deal => `
+            grid.innerHTML = deals.map(deal => {
+                const departStr = formatDateForAviasales(deal.depart_date);
+                const returnStr = formatDateForAviasales(deal.return_date);
+                const searchLink = `https://www.aviasales.ru/search/${deal.origin}${departStr}${deal.destination}${returnStr}1?marker=${CONFIG.MARKER}`;
+
+                return `
                 <div class="deal-card bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col">
                     <div class="flex justify-between items-start mb-4">
                         <div class="bg-brand-50 p-2.5 rounded-xl">
@@ -939,48 +937,67 @@
                     </div>
                     <h3 class="font-bold font-heading text-gray-900 mb-1">${deal.origin_name} → ${deal.destination_name}</h3>
                     <p class="text-xs text-gray-500 mb-4 flex-1">${deal.trip}</p>
-                    <a href="https://www.aviasales.ru/search/${deal.origin}${deal.destination}1?marker=${CONFIG.MARKER}" 
+                    <a href="${searchLink}" 
                        target="_blank" rel="noopener"
                        class="block w-full py-2.5 bg-gray-50 text-brand-600 rounded-xl text-sm font-bold hover:bg-brand-600 hover:text-white transition-all text-center">
                         Смотреть билеты →
                     </a>
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             // Переинициализировать Lucide иконки
             lucide.createIcons();
         }
 
-        // ===== МОБИЛЬНОЕ МЕНЮ =====
+        // Данные-заглушки (если API не работает)
+        const FALLBACK_DEALS = [
+            { origin: 'MOW', origin_name: 'Москва', destination: 'IST', destination_name: 'Стамбул', price: 12500, trip: 'В одну сторону', depart_date: '2024-03-20', return_date: '' }, // Example dates
+            { origin: 'MOW', origin_name: 'Москва', destination: 'AER', destination_name: 'Сочи', price: 4500, trip: 'В одну сторону', depart_date: '2024-03-21', return_date: '' },
+            { origin: 'MOW', origin_name: 'Москва', destination: 'DXB', destination_name: 'Дубай', price: 23000, trip: 'В одну сторону', depart_date: '2024-03-22', return_date: '' },
+            { origin: 'MOW', origin_name: 'Москва', destination: 'HKT', destination_name: 'Пхукет', price: 42000, trip: 'Туда-обратно', depart_date: '2024-03-23', return_date: '2024-04-05' },
+        ];
+
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        window.addEventListener('scroll', reveal);
+
+        function reveal() {
+            var reveals = document.querySelectorAll('.fade-up');
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add('visible');
+                }
+            }
+        }
+
+        // Мобильное меню
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+
         function openMobileMenu() {
-            document.getElementById('mobileMenu').classList.add('open');
-            document.getElementById('mobileOverlay').classList.add('open');
-            document.body.style.overflow = 'hidden';
+            mobileMenu.classList.add('open');
+            mobileOverlay.classList.remove('hidden'); // Ensure it's not hidden first if needed
+            // Use timeout to allow transition
+            setTimeout(() => mobileOverlay.classList.add('open'), 10);
         }
 
         function closeMobileMenu() {
-            document.getElementById('mobileMenu').classList.remove('open');
-            document.getElementById('mobileOverlay').classList.remove('open');
-            document.body.style.overflow = '';
+            mobileMenu.classList.remove('open');
+            mobileOverlay.classList.remove('open');
         }
 
-        // ===== АНИМАЦИИ ПРИ СКРОЛЛЕ =====
-        const fadeObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        // Старт
+        document.addEventListener('DOMContentLoaded', () => {
+            initDates();
+            loadHotDeals();
+            lucide.createIcons();
+            reveal(); // Check scroll on load
+        });
 
-        document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
-
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
-        lucide.createIcons();
-        initDates();
-        loadHotDeals();
-
-        console.log('VoyogeStories Engine v1.0 — Initialized ✈️');
     </script>
 </body>
 
