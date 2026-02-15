@@ -1,0 +1,17 @@
+{
+  "name": "voyogestories-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker proxy for Aviasales",
+  "main": "aviasales-proxy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
