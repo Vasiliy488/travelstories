@@ -650,11 +650,11 @@
     <script>
         // ===== КОНФИГУРАЦИЯ =====
         const CONFIG = {
-            // Вставьте ваш Travelpayouts API токен сюда:
-            API_TOKEN: '33455759bbacefe8bc09110cb398bbd9',
-            API_BASE: 'https://api.travelpayouts.com',
+            // Cloudflare Worker Proxy (no token needed here)
+            API_BASE: 'https://aviasales-proxy.brainholland64.workers.dev',
             MARKER: '703570', // Ваш партнёрский маркер
             CURRENCY: 'rub',
+            // API_TOKEN removed - handled by Worker
         };
 
         // ===== IATA-коды городов =====
@@ -896,16 +896,12 @@
             // Показать shimmer
             grid.innerHTML = Array(8).fill('<div class="shimmer rounded-2xl h-48"></div>').join('');
 
-            if (CONFIG.API_TOKEN === 'YOUR_TOKEN_HERE') {
-                // Нет токена — показать fallback
-                setTimeout(() => renderDeals(FALLBACK_DEALS), 600);
-                return;
-            }
-
+            // Token check removed - handled by Worker
+            
             try {
                 const response = await fetch(
-                    `${CONFIG.API_BASE}/v2/prices/latest?currency=${CONFIG.CURRENCY}&period_type=year&page=1&limit=8&sorting=price&trip_class=0`,
-                    { headers: { 'X-Access-Token': CONFIG.API_TOKEN } }
+                    `${CONFIG.API_BASE}/v2/prices/latest?currency=${CONFIG.CURRENCY}&period_type=year&page=1&limit=8&sorting=price&trip_class=0`
+                    // No headers needed for public proxy
                 );
 
                 if (!response.ok) throw new Error('API Error');
