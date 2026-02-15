@@ -1,114 +1,660 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Поиск авиабилетов</title>
-    <!-- v1.1 Static List Restored -->
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <title>VoyogeStories — Поиск билетов и путеводители</title>
+    <meta name="description"
+        content="VoyogeStories — ищем лучшие цены на авиабилеты, горящие предложения и путеводители по популярным направлениям.">
+    <meta property="og:title" content="VoyogeStories — Поиск билетов и путеводители">
+    <meta property="og:description" content="Лучшие цены на авиабилеты, горящие предложения и путеводители.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://voyogestories.ru">
+    <!-- Travelpayouts Verification -->
+    <script data-noptimize="1" data-cfasync="false" data-wpfc-render="false">
+        (function () {
+            var script = document.createElement("script");
+            script.async = 1;
+            script.src = 'https://emrldtp.com/NDk4Njc2.js?t=703570';
+            document.head.appendChild(script);
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['Outfit', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef6ff',
+                            100: '#d9eaff',
+                            200: '#bcdbff',
+                            300: '#8ec5ff',
+                            400: '#59a4ff',
+                            500: '#3381fc',
+                            600: '#1d62f1',
+                            700: '#154dde',
+                            800: '#183fb4',
+                            900: '#19398e',
+                        },
+                        accent: {
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
         }
 
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
         }
 
-        .input-field {
-            transition: all 0.2s ease;
-            border: 1px solid #e5e7eb;
+        /* Glassmorphism Nav */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
-        .input-field:focus {
-            border-color: #f97316;
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
-            outline: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
-        }
-
-        .autocomplete-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            max-height: 240px;
-            overflow-y: auto;
-            margin-top: 4px;
-            border: 1px solid #f3f4f6;
-        }
-
-        /* Скроллбар для списков */
-        .autocomplete-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        .autocomplete-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .autocomplete-list::-webkit-scrollbar-thumb {
-            background-color: #e5e7eb;
-            border-radius: 20px;
-        }
-
-        /* Анимация появления */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-
-        /* Стили для карточек */
+        /* Card hover effects */
         .deal-card {
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .deal-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
         }
 
-        /* Стили для переключателя */
-        .trip-type-btn {
-            @apply px-4 py-2 rounded-full text-sm font-medium transition-colors;
-        }
-        .trip-type-btn.active {
-            @apply bg-orange-100 text-orange-700;
-        }
-        .trip-type-btn:not(.active) {
-            @apply text-gray-500 hover:bg-gray-100;
+        .article-card:hover img {
+            transform: scale(1.08);
         }
 
-        .hidden-date {
-            display: none;
+        .price-badge {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(6px);
+        }
+
+        /* Scroll animations */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hero gradient overlay */
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(21, 77, 222, 0.5) 0%, rgba(25, 57, 142, 0.3) 50%, rgba(0, 0, 0, 0.2) 100%);
+        }
+
+        /* Shimmer loading */
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* Pulse dot */
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        .mobile-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        .mobile-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* City autocomplete */
+        .autocomplete-list {
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 9999;
+            position: absolute;
+        }
+
+        .autocomplete-list div:hover {
+            background: #eef6ff;
+        }
+
+        /* Trip type toggle */
+        .trip-toggle {
+            transition: all 0.25s ease;
+        }
+
+        .trip-toggle.active {
+            background: #154dde;
+            color: white;
+            box-shadow: 0 2px 8px rgba(21, 77, 222, 0.3);
+        }
+
+        .trip-toggle:not(.active) {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .trip-toggle:not(.active):hover {
+            background: #e2e8f0;
+        }
+
+        /* Date inputs */
+        input[type="date"] {
+            color-scheme: light;
+        }
+
+        .date-field {
+            transition: opacity 0.3s ease, max-width 0.3s ease;
+        }
+
+        .date-field.hidden-date {
+            opacity: 0;
+            max-width: 0;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            border: 0;
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Footer gradient */
+        .footer-gradient {
+            background: linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
         }
     </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <!-- Мобильное меню overlay -->
+    <div id="mobileOverlay" class="mobile-overlay fixed inset-0 bg-black/40 z-[90]" onclick="closeMobileMenu()"></div>
+
+    <!-- Мобильное меню -->
+    <div id="mobileMenu"
+        class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white z-[100] shadow-2xl p-8 flex flex-col">
+        <div class="flex justify-between items-center mb-10">
+            <span class="text-xl font-bold font-heading text-gray-900">Voyoge<span
+                    class="text-brand-600">Stories</span></span>
+            <button onclick="closeMobileMenu()" class="p-2 hover:bg-gray-100 rounded-xl transition">
+                <i data-lucide="x" class="w-6 h-6 text-gray-500"></i>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-2">
+            <a href="#hot-deals" onclick="closeMobileMenu()"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-brand-50 text-gray-700 font-medium transition">
+                <i data-lucide="flame" class="w-5 h-5 text-accent-500"></i> Горящие цены
+            </a>
+            <a href="#guides" onclick="closeMobileMenu()"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-brand-50 text-gray-700 font-medium transition">
+                <i data-lucide="map" class="w-5 h-5 text-brand-600"></i> Путеводители
+            </a>
+            <a href="#destinations" onclick="closeMobileMenu()"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-brand-50 text-gray-700 font-medium transition">
+                <i data-lucide="compass" class="w-5 h-5 text-brand-600"></i> Направления
+            </a>
+        </nav>
+        <div class="mt-auto pt-8 border-t">
+            <p class="text-xs text-gray-400">© 2026 VoyogeStories</p>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="glass-nav border-b border-gray-100/80 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 lg:h-20 items-center">
+                <a href="#" class="flex items-center gap-2.5 group">
+                    <div
+                        class="bg-gradient-to-br from-brand-500 to-brand-700 p-2 rounded-xl shadow-lg shadow-brand-200 group-hover:shadow-brand-300 transition">
+                        <i data-lucide="compass" class="text-white w-5 h-5"></i>
+                    </div>
+                    <span class="text-xl lg:text-2xl font-bold font-heading text-gray-900 tracking-tight">Voyoge<span
+                            class="text-brand-600">Stories</span></span>
+                </a>
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="#hot-deals"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-accent-500 hover:bg-accent-500/10 transition flex items-center gap-1.5">
+                        <i data-lucide="flame" class="w-4 h-4"></i> Горящие цены
+                    </a>
+                    <a href="#guides"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:text-brand-600 hover:bg-brand-50 transition">Путеводители</a>
+                    <a href="#destinations"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:text-brand-600 hover:bg-brand-50 transition">Направления</a>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden lg:flex items-center gap-2 text-xs text-gray-400 font-medium">
+                        <span class="pulse-dot w-2 h-2 bg-green-400 rounded-full inline-block"></span>
+                        Обновлено сегодня
+                    </div>
+                    <button onclick="openMobileMenu()" class="md:hidden p-2 hover:bg-gray-100 rounded-xl transition">
+                        <i data-lucide="menu" class="w-6 h-6 text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="relative min-h-[480px] lg:min-h-[520px] flex items-center justify-center">
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2000"
+            alt="Путешествие" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 hero-gradient"></div>
+        <div class="relative z-10 text-center text-white px-4 max-w-4xl w-full py-16">
+            <div
+                class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> Лучшие цены на авиабилеты
+            </div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold font-heading mb-4 leading-tight">
+                Ваше путешествие<br>начинается здесь
+            </h1>
+            <p class="text-lg md:text-xl mb-10 opacity-90 max-w-2xl mx-auto">
+                Мы находим самые выгодные рейсы среди сотен авиакомпаний
+            </p>
+
+            <!-- Форма поиска -->
+            <div id="searchForm" class="bg-white p-3 sm:p-4 rounded-2xl shadow-2xl shadow-black/20 max-w-4xl mx-auto">
+                <!-- Переключатель Туда-обратно / В одну сторону -->
+                <div class="flex items-center gap-2 mb-3">
+                    <button id="btnRoundTrip" onclick="toggleTripType('roundtrip')"
+                        class="trip-toggle active px-4 py-1.5 rounded-full text-xs font-bold">
+                        Туда-обратно
+                    </button>
+                    <button id="btnOneWay" onclick="toggleTripType('oneway')"
+                        class="trip-toggle px-4 py-1.5 rounded-full text-xs font-bold">
+                        В одну сторону
+                    </button>
+                </div>
+                <!-- Поля ввода -->
+                <div class="flex flex-col md:flex-row items-stretch gap-2">
+                    <!-- Откуда -->
+                    <div class="relative flex-1 w-full">
+                        <div class="flex items-center gap-2 px-4 text-gray-800 bg-gray-50 rounded-xl">
+                            <i data-lucide="plane-takeoff" class="w-5 h-5 text-gray-400 shrink-0"></i>
+                            <input id="inputFrom" type="text" placeholder="Откуда" autocomplete="off"
+                                class="w-full py-3 bg-transparent outline-none text-sm font-medium"
+                                onfocus="showAutocomplete('from')" oninput="filterCities('from')">
+                        </div>
+                        <div id="autocompleteFrom"
+                            class="autocomplete-list hidden top-full left-0 right-0 bg-white rounded-xl shadow-xl border border-gray-100 mt-1 py-1">
+                        </div>
+                    </div>
+                    <!-- Куда -->
+                    <div class="relative flex-1 w-full">
+                        <div class="flex items-center gap-2 px-4 text-gray-800 bg-gray-50 rounded-xl">
+                            <i data-lucide="plane-landing" class="w-5 h-5 text-gray-400 shrink-0"></i>
+                            <input id="inputTo" type="text" placeholder="Куда" autocomplete="off"
+                                class="w-full py-3 bg-transparent outline-none text-sm font-medium"
+                                onfocus="showAutocomplete('to')" oninput="filterCities('to')">
+                        </div>
+                        <div id="autocompleteTo"
+                            class="autocomplete-list hidden top-full left-0 right-0 bg-white rounded-xl shadow-xl border border-gray-100 mt-1 py-1">
+                        </div>
+                    </div>
+                    <!-- Дата вылета -->
+                    <div class="relative w-full md:w-40">
+                        <div class="flex items-center gap-2 px-4 text-gray-800 bg-gray-50 rounded-xl">
+                            <i data-lucide="calendar" class="w-5 h-5 text-gray-400 shrink-0"></i>
+                            <input id="inputDateDepart" type="date" title="Дата вылета"
+                                class="w-full py-3 bg-transparent outline-none text-sm font-medium cursor-pointer">
+                        </div>
+                    </div>
+                    <!-- Дата прилёта (только Туда-обратно) -->
+                    <div id="returnDateField" class="date-field relative w-full md:w-40">
+                        <div class="flex items-center gap-2 px-4 text-gray-800 bg-gray-50 rounded-xl">
+                            <i data-lucide="calendar-check" class="w-5 h-5 text-gray-400 shrink-0"></i>
+                            <input id="inputDateReturn" type="date" title="Дата возврата"
+                                class="w-full py-3 bg-transparent outline-none text-sm font-medium cursor-pointer">
+                        </div>
+                    </div>
+                    <!-- Кнопка -->
+                    <button onclick="searchFlights()"
+                        class="w-full md:w-auto bg-gradient-to-r from-accent-500 to-accent-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:shadow-accent-500/30 transition-all text-sm flex items-center justify-center gap-2 whitespace-nowrap">
+                        <i data-lucide="search" class="w-4 h-4"></i> Найти
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+
+        <!-- Горящие предложения -->
+        <section id="hot-deals" class="mb-20 fade-up">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl lg:text-3xl font-bold font-heading flex items-center gap-3">
+                        <div class="bg-green-100 p-2 rounded-xl">
+                            <i data-lucide="trending-down" class="text-green-600 w-6 h-6"></i>
+                        </div>
+                        Лучшие цены
+                    </h2>
+                    <p class="text-gray-500 text-sm mt-2 flex items-center gap-2">
+                        <span class="pulse-dot w-1.5 h-1.5 bg-green-400 rounded-full inline-block"></span>
+                        Обновляется автоматически
+                    </p>
+                </div>
+                <button onclick="loadHotDeals()"
+                    class="text-sm text-brand-600 hover:text-brand-700 font-semibold flex items-center gap-1 transition">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Обновить
+                </button>
+            </div>
+
+            <div id="dealsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- Loading shimmer -->
+                <div class="shimmer rounded-2xl h-48"></div>
+                <div class="shimmer rounded-2xl h-48"></div>
+                <div class="shimmer rounded-2xl h-48"></div>
+                <div class="shimmer rounded-2xl h-48"></div>
+            </div>
+        </section>
+
+        <!-- Путеводители -->
+        <section id="guides" class="mb-20 fade-up">
+            <div class="flex items-end justify-between mb-8">
+                <div>
+                    <h2 class="text-2xl lg:text-3xl font-bold font-heading flex items-center gap-3">
+                        <div class="bg-brand-100 p-2 rounded-xl">
+                            <i data-lucide="book-open" class="text-brand-600 w-6 h-6"></i>
+                        </div>
+                        Путеводители
+                    </h2>
+                    <p class="text-gray-500 text-sm mt-2">Проверенные маршруты и советы от путешественников</p>
+                </div>
+            </div>
+            <div id="destinations" class="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
+                <!-- Стамбул -->
+                <article
+                    class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=800"
+                            class="w-full h-full object-cover transition-transform duration-500" alt="Стамбул"
+                            loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                        <div
+                            class="absolute bottom-4 left-4 price-badge px-3 py-1.5 rounded-full text-xs font-bold text-brand-600">
+                            Билеты от 12 000 ₽</div>
+                        <div
+                            class="absolute top-4 right-4 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold text-gray-700">
+                            🇹🇷 Турция</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold font-heading text-xl mb-2 group-hover:text-brand-600 transition">Стамбул за
+                            3 дня: Идеальный маршрут</h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-2">Где жить, что есть и как сэкономить на
+                            музеях. Полный гид по главным достопримечательностям.</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-400">
+                            <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> 12.4k</span>
+                            <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 8
+                                мин</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Бали -->
+                <article
+                    class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800"
+                            class="w-full h-full object-cover transition-transform duration-500" alt="Бали"
+                            loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                        <div
+                            class="absolute bottom-4 left-4 price-badge px-3 py-1.5 rounded-full text-xs font-bold text-brand-600">
+                            Отели от $15/ночь</div>
+                        <div
+                            class="absolute top-4 right-4 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold text-gray-700">
+                            🇮🇩 Индонезия</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold font-heading text-xl mb-2 group-hover:text-brand-600 transition">Бали 2026:
+                            Гид по районам</h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-2">Чангу, Убуд или Улувату? Выбираем район под
+                            ваш бюджет и стиль отдыха.</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-400">
+                            <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> 8.2k</span>
+                            <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 10
+                                мин</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Грузия -->
+                <article
+                    class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1565008576549-57569a49371d?auto=format&fit=crop&q=80&w=800"
+                            class="w-full h-full object-cover transition-transform duration-500" alt="Грузия"
+                            loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                        <div
+                            class="absolute bottom-4 left-4 price-badge px-3 py-1.5 rounded-full text-xs font-bold text-brand-600">
+                            Билеты от 9 500 ₽</div>
+                        <div
+                            class="absolute top-4 right-4 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold text-gray-700">
+                            🇬🇪 Грузия</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold font-heading text-xl mb-2 group-hover:text-brand-600 transition">Грузия:
+                            Тбилиси и горы за неделю</h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-2">Старый город, хинкали, Казбеги и Сванетия —
+                            лучший маршрут на 7 дней.</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-400">
+                            <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> 6.8k</span>
+                            <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 12
+                                мин</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Таиланд -->
+                <article
+                    class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&q=80&w=800"
+                            class="w-full h-full object-cover transition-transform duration-500" alt="Таиланд"
+                            loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                        <div
+                            class="absolute bottom-4 left-4 price-badge px-3 py-1.5 rounded-full text-xs font-bold text-brand-600">
+                            Билеты от 28 000 ₽</div>
+                        <div
+                            class="absolute top-4 right-4 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold text-gray-700">
+                            🇹🇭 Таиланд</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold font-heading text-xl mb-2 group-hover:text-brand-600 transition">Таиланд:
+                            Бангкок + острова бюджетно</h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-2">Как совместить городской драйв и пляжный
+                            отдых за 50 000 ₽ на двоих.</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-400">
+                            <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> 9.1k</span>
+                            <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 9
+                                мин</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Черногория -->
+                <article
+                    class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1555990538-1b0f76b1052d?auto=format&fit=crop&q=80&w=800"
+                            class="w-full h-full object-cover transition-transform duration-500" alt="Черногория"
+                            loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                        <div
+                            class="absolute bottom-4 left-4 price-badge px-3 py-1.5 rounded-full text-xs font-bold text-brand-600">
+                            Билеты от 15 000 ₽</div>
+                        <div
+                            class="absolute top-4 right-4 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold text-gray-700">
+                            🇲🇪 Черногория</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold font-heading text-xl mb-2 group-hover:text-brand-600 transition">
+                            Черногория: Адриатика без толп</h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-2">Котор, Будва, Дурмитор — маршрут для тех, кто
+                            любит природу и море.</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-400">
+                            <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> 5.3k</span>
+                            <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 7
+                                мин</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Дубай -->
+                <article
+                    class="article-card group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100">
+                    <div class="relative h-56 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&q=80&w=800"
+                            class="w-full h-full object-cover transition-transform duration-500" alt="Дубай"
+                            loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                        <div
+                            class="absolute bottom-4 left-4 price-badge px-3 py-1.5 rounded-full text-xs font-bold text-brand-600">
+                            Билеты от 22 000 ₽</div>
+                        <div
+                            class="absolute top-4 right-4 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold text-gray-700">
+                            🇦🇪 ОАЭ</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold font-heading text-xl mb-2 group-hover:text-brand-600 transition">Дубай:
+                            Роскошь и доступные альтернативы</h3>
+                        <p class="text-sm text-gray-500 mb-4 line-clamp-2">Как увидеть всё лучшее в Дубае и не
+                            разориться — гид по бюджетному отдыху.</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-400">
+                            <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3 h-3"></i> 11.7k</span>
+                            <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> 11
+                                мин</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-gradient border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <div>
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="bg-gradient-to-br from-brand-500 to-brand-700 p-2 rounded-xl">
+                            <i data-lucide="compass" class="text-white w-5 h-5"></i>
+                        </div>
+                        <span class="text-xl font-bold font-heading text-gray-900">Voyoge<span
+                                class="text-brand-600">Stories</span></span>
+                    </div>
+                    <p class="text-sm text-gray-500 leading-relaxed">Находим лучшие цены на авиабилеты и делимся
+                        проверенными маршрутами путешествий.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold font-heading text-gray-900 mb-4">Разделы</h4>
+                    <ul class="space-y-2.5 text-sm text-gray-500">
+                        <li><a href="#hot-deals" class="hover:text-brand-600 transition">Горящие предложения</a></li>
+                        <li><a href="#guides" class="hover:text-brand-600 transition">Путеводители</a></li>
+                        <li><a href="#destinations" class="hover:text-brand-600 transition">Направления</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold font-heading text-gray-900 mb-4">Информация</h4>
+                    <ul class="space-y-2.5 text-sm text-gray-500">
+                        <li>Данные о ценах от Aviasales</li>
+                        <li>Цены обновляются ежедневно</li>
+                        <li class="flex items-center gap-2">
+                            <span class="pulse-dot w-1.5 h-1.5 bg-green-400 rounded-full inline-block"></span>
+                            Сервис работает
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-8 text-center">
+                <p class="text-xs text-gray-400">© 2026 VoyogeStories. Данные о ценах предоставлены API
+                    Aviasales/Travelpayouts.</p>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        // CONFIGURATION
+        // ===== КОНФИГУРАЦИЯ =====
         const CONFIG = {
-            MARKER: '492652', // Partner ID
-            API_BASE: 'https://travelstories.vasiliy488.workers.dev', // Cloudflare Worker URL
-            CURRENCY: 'rub'
+            // Cloudflare Worker Proxy (no token needed here)
+            API_BASE: 'https://aviasales-proxy.brainholland64.workers.dev',
+            MARKER: '703570', // Ваш партнёрский маркер
+            CURRENCY: 'rub',
+            // API_TOKEN removed - handled by Worker
         };
 
         // ===== IATA-коды городов =====
@@ -330,6 +876,18 @@
             }
         });
 
+        // ===== ГОРЯЩИЕ ПРЕДЛОЖЕНИЯ — API =====
+        const FALLBACK_DEALS = [
+            { origin: 'MOW', origin_name: 'Москва', destination: 'IST', destination_name: 'Стамбул', price: 12500, trip: 'Туда-обратно' },
+            { origin: 'LED', origin_name: 'СПб', destination: 'HKT', destination_name: 'Пхукет', price: 45200, trip: 'Туда-обратно, 1 пересадка' },
+            { origin: 'MOW', origin_name: 'Москва', destination: 'AER', destination_name: 'Сочи', price: 8900, trip: 'В одну сторону' },
+            { origin: 'KZN', origin_name: 'Казань', destination: 'DXB', destination_name: 'Дубай', price: 31000, trip: 'Туда-обратно' },
+            { origin: 'MOW', origin_name: 'Москва', destination: 'TBS', destination_name: 'Тбилиси', price: 14800, trip: 'Туда-обратно' },
+            { origin: 'LED', origin_name: 'СПб', destination: 'AYT', destination_name: 'Анталья', price: 18500, trip: 'Туда-обратно' },
+            { origin: 'MOW', origin_name: 'Москва', destination: 'BKK', destination_name: 'Бангкок', price: 35600, trip: 'Туда-обратно, 1 пересадка' },
+            { origin: 'SVX', origin_name: 'Екатеринбург', destination: 'TIV', destination_name: 'Тиват', price: 27400, trip: 'Туда-обратно' },
+        ];
+
         // ===== ГОРЯЩИЕ ЦЕНЫ (API) =====
         // Маппинг IATA → название города
         const CITY_NAMES = {};
@@ -373,263 +931,72 @@
 
         function renderDeals(deals) {
             const grid = document.getElementById('dealsGrid');
-            grid.innerHTML = '';
-
-            deals.forEach(deal => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl p-5 border border-gray-100 deal-card flex flex-col justify-between h-full';
-                
-                // Форматируем даты для отображения
-                const dateOptions = { day: 'numeric', month: 'long' };
-                const departDate = deal.depart_date ? new Date(deal.depart_date).toLocaleDateString('ru-RU', dateOptions) : '';
-                const returnDate = deal.return_date ? new Date(deal.return_date).toLocaleDateString('ru-RU', dateOptions) : '';
-                
-                // Формируем ссылку на Aviasales
-                // ВАЖНО: Формат должен быть DDMM для даты
-                // Пример: MOW1502SIP1 (Москва -> Симферополь, 15 февраля, 1 пассажир)
-                // Если с возвратом: MOW1502SIP25021
-                
+            grid.innerHTML = deals.map(deal => {
                 const departStr = formatDateForAviasales(deal.depart_date);
                 const returnStr = formatDateForAviasales(deal.return_date);
-                
-                // Если в одну сторону, не добавляем дату возврата
-                // Если туда-обратно, добавляем
-                
-                let searchPath = `${deal.origin}${departStr}${deal.destination}`;
-                if (deal.return_date && returnStr) {
-                    searchPath += returnStr;
-                }
-                
-                const searchLink = `https://www.aviasales.ru/search/${searchPath}1?marker=${CONFIG.MARKER}`;
-                
-                console.log('Generated Link:', { 
-                    origin: deal.origin, 
-                    dest: deal.destination, 
-                    depart: departStr, 
-                    return: returnStr, 
-                    link: searchLink 
+                const searchLink = `https://www.aviasales.ru/search/${deal.origin}${departStr}${deal.destination}${returnStr}1?marker=${CONFIG.MARKER}`;
+                console.log('Generated Link:', {
+                    origin: deal.origin,
+                    dest: deal.destination,
+                    depart: departStr,
+                    return: returnStr,
+                    link: searchLink
                 });
 
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="font-bold text-gray-900 text-lg leading-tight mb-1">
-                                    ${deal.destination_name}
-                                </h3>
-                                <div class="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded-full inline-block">
-                                    из ${deal.origin_name}
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="block text-xl font-bold text-orange-600">
-                                    ${deal.price.toLocaleString('ru-RU')} ₽
-                                </span>
-                                <span class="text-xs text-gray-400">
-                                    ${deal.trip}
-                                </span>
-                            </div>
+                return `
+                <div class="deal-card bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-brand-50 p-2.5 rounded-xl">
+                            <i data-lucide="plane" class="text-brand-600 w-5 h-5"></i>
                         </div>
-
-                        <div class="space-y-3 mb-6">
-                            <div class="flex items-center gap-3 text-sm text-gray-600">
-                                <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
-                                    <i data-lucide="plane-takeoff" class="w-4 h-4 text-orange-500"></i>
-                                </div>
-                                <div class="flex flex-col">
-                                    <span class="text-xs text-gray-400">Вылет</span>
-                                    <span class="font-medium">${departDate}</span>
-                                </div>
-                            </div>
-                            ${deal.return_date ? `
-                            <div class="flex items-center gap-3 text-sm text-gray-600">
-                                <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
-                                    <i data-lucide="plane-landing" class="w-4 h-4 text-orange-500"></i>
-                                </div>
-                                <div class="flex flex-col">
-                                    <span class="text-xs text-gray-400">Возврат</span>
-                                    <span class="font-medium">${returnDate}</span>
-                                </div>
-                            </div>
-                            ` : ''}
-                        </div>
+                        <span class="text-green-600 font-bold text-lg">от ${deal.price.toLocaleString('ru-RU')} ₽</span>
                     </div>
-
-                    <a href="${searchLink}" target="_blank" 
-                       class="w-full mt-auto bg-gray-900 text-white py-3 rounded-xl font-medium text-sm hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 group">
-                        <span>Найти билеты</span>
-                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    <h3 class="font-bold font-heading text-gray-900 mb-1">${deal.origin_name} → ${deal.destination_name}</h3>
+                    <p class="text-xs text-gray-500 mb-4 flex-1">${deal.trip}</p>
+                    <a href="${searchLink}" 
+                       target="_blank" rel="noopener"
+                       class="block w-full py-2.5 bg-gray-50 text-brand-600 rounded-xl text-sm font-bold hover:bg-brand-600 hover:text-white transition-all text-center">
+                        Смотреть билеты →
                     </a>
-                `;
-                grid.appendChild(card);
-            });
+                </div>
+            `;
+            }).join('');
+
+            // Переинициализировать Lucide иконки
             lucide.createIcons();
         }
 
-        const FALLBACK_DEALS = [
-            { origin: 'MOW', origin_name: 'Москва', destination: 'AER', destination_name: 'Сочи', price: 12500, trip: 'Туда-обратно', depart_date: '2024-06-15', return_date: '2024-06-22' },
-            { origin: 'LED', origin_name: 'Санкт-Петербург', destination: 'KGD', destination_name: 'Калининград', price: 8900, trip: 'Туда-обратно', depart_date: '2024-07-01', return_date: '2024-07-08' },
-            { origin: 'MOW', origin_name: 'Москва', destination: 'IST', destination_name: 'Стамбул', price: 25400, trip: 'Туда-обратно', depart_date: '2024-05-20', return_date: '2024-05-27' },
-            { origin: 'SVX', origin_name: 'Екатеринбург', destination: 'TIV', destination_name: 'Тиват', price: 27400, trip: 'Туда-обратно', depart_date: '2024-08-10', return_date: '2024-08-20' },
-        ];
+        // ===== МОБИЛЬНОЕ МЕНЮ =====
+        function openMobileMenu() {
+            document.getElementById('mobileMenu').classList.add('open');
+            document.getElementById('mobileOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
 
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            initDates();
-            lucide.createIcons();
-            loadHotDeals();
-        });
+        function closeMobileMenu() {
+            document.getElementById('mobileMenu').classList.remove('open');
+            document.getElementById('mobileOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // ===== АНИМАЦИИ ПРИ СКРОЛЛЕ =====
+        const fadeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.fade-up').forEach(el => fadeObserver.observe(el));
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        lucide.createIcons();
+        initDates();
+        loadHotDeals();
+
+        console.log('VoyogeStories Engine v1.0 — Initialized ✈️');
     </script>
-</head>
-<body class="min-h-screen text-gray-800 selection:bg-orange-100 selection:text-orange-600">
-
-    <!-- HERO SECTION -->
-    <div class="relative bg-white pb-20 pt-10 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div class="absolute inset-0 z-0 opacity-40">
-            <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop" 
-                 class="w-full h-full object-cover grayscale brightness-125" alt="Travel Background">
-            <div class="absolute inset-0 bg-gradient-to-b from-white/80 via-white/40 to-white"></div>
-        </div>
-
-        <div class="relative z-10 max-w-5xl mx-auto">
-            <!-- Header -->
-            <header class="flex justify-between items-center mb-16">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-200">
-                        <i data-lucide="plane" class="text-white w-6 h-6"></i>
-                    </div>
-                    <span class="text-2xl font-bold tracking-tight text-gray-900">Voyage<span class="text-orange-600">Stories</span></span>
-                </div>
-                <!-- Можно добавить меню/валюту/язык -->
-            </header>
-
-            <!-- Main Title -->
-            <div class="text-center mb-12">
-                <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight mb-6 leading-tight">
-                    Откройте мир <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500">
-                        по лучшим ценам
-                    </span>
-                </h1>
-                <p class="text-xl text-gray-500 max-w-2xl mx-auto font-light">
-                    Умный поиск авиабилетов по всем авиакомпаниям мира. Находите скрытые тарифы и путешествуйте чаще.
-                </p>
-            </div>
-
-            <!-- Search Widget Container -->
-            <div class="glass-panel rounded-3xl p-6 md:p-8 max-w-4xl mx-auto">
-                
-                <!-- Trip Type Toggles -->
-                <div class="flex gap-2 mb-6 justify-center md:justify-start">
-                    <button id="btnRoundTrip" class="trip-type-btn active" onclick="toggleTripType('roundtrip')">
-                        Туда-обратно
-                    </button>
-                    <button id="btnOneWay" class="trip-type-btn" onclick="toggleTripType('oneway')">
-                        В одну сторону
-                    </button>
-                </div>
-
-                <!-- Inputs Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 relative">
-                    
-                    <!-- From -->
-                    <div class="md:col-span-3 relative group">
-                        <label class="block text-xs font-semibold text-gray-400 mb-1 ml-1 uppercase tracking-wider">Откуда</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                <i data-lucide="map-pin" class="w-5 h-5"></i>
-                            </span>
-                            <input type="text" id="inputFrom" 
-                                   class="w-full pl-11 pr-4 py-4 bg-gray-50 rounded-xl font-medium text-gray-900 input-field"
-                                   placeholder="Город вылета"
-                                   oninput="filterCities('from')"
-                                   onclick="showAutocomplete('from')"
-                                   autocomplete="off">
-                            <!-- Autocomplete Dropdown -->
-                            <div id="autocompleteFrom" class="autocomplete-list hidden">
-                                <!-- JS will populate this -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Swap Button (Desktop only for visual balance, logically skips on mobile) -->
-                    <div class="hidden md:flex md:col-span-1 items-end justify-center pb-2">
-                        <button class="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-orange-500 transition-colors">
-                            <i data-lucide="arrow-right-left" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-
-                    <!-- To -->
-                    <div class="md:col-span-3 relative group">
-                        <label class="block text-xs font-semibold text-gray-400 mb-1 ml-1 uppercase tracking-wider">Куда</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                <i data-lucide="plane" class="w-5 h-5"></i>
-                            </span>
-                            <input type="text" id="inputTo" 
-                                   class="w-full pl-11 pr-4 py-4 bg-gray-50 rounded-xl font-medium text-gray-900 input-field"
-                                   placeholder="Куда летим?"
-                                   oninput="filterCities('to')"
-                                   onclick="showAutocomplete('to')"
-                                   autocomplete="off">
-                            <div id="autocompleteTo" class="autocomplete-list hidden">
-                                <!-- JS will populate this -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Dates -->
-                    <div class="md:col-span-3 flex gap-2">
-                        <div class="flex-1 relative">
-                            <label class="block text-xs font-semibold text-gray-400 mb-1 ml-1 uppercase tracking-wider">Туда</label>
-                            <input type="date" id="inputDateDepart" 
-                                   class="w-full px-4 py-4 bg-gray-50 rounded-xl font-medium text-gray-900 input-field text-sm cursor-pointer">
-                        </div>
-                        <div class="flex-1 relative" id="returnDateField">
-                            <label class="block text-xs font-semibold text-gray-400 mb-1 ml-1 uppercase tracking-wider">Обратно</label>
-                            <input type="date" id="inputDateReturn" 
-                                   class="w-full px-4 py-4 bg-gray-50 rounded-xl font-medium text-gray-900 input-field text-sm cursor-pointer">
-                        </div>
-                    </div>
-
-                    <!-- Search Button -->
-                    <div class="md:col-span-2 flex items-end">
-                        <button onclick="searchFlights()" 
-                                class="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-orange-200 btn-primary flex items-center justify-center gap-2">
-                            <span>Найти</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- HOT DEALS SECTION -->
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="flex justify-between items-end mb-10">
-            <div>
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">Лучшие цены на авиабилеты</h2>
-                <p class="text-gray-500">Самые выгодные предложения, найденные за последние 48 часов</p>
-            </div>
-            <!-- <button class="text-orange-600 font-medium hover:text-orange-700 flex items-center gap-1">
-                Показать все <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </button> -->
-        </div>
-
-        <div id="dealsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- JS will populate cards here -->
-        </div>
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-gray-100 py-12 mt-12">
-        <div class="max-w-6xl mx-auto px-4 text-center">
-            <p class="text-gray-400 text-sm">
-                &copy; 2024 VoyageStories. Поиск авиабилетов. <br>
-                Данные предоставлены партнерами Aviasales.
-            </p>
-        </div>
-    </footer>
-
 </body>
+
 </html>
