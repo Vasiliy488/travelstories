@@ -76,14 +76,12 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        /* Glassmorphism Nav */
         .glass-nav {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
         }
 
-        /* Card hover effects */
         .deal-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -102,7 +100,6 @@
             backdrop-filter: blur(6px);
         }
 
-        /* Scroll animations */
         .fade-up {
             opacity: 0;
             transform: translateY(30px);
@@ -114,12 +111,10 @@
             transform: translateY(0);
         }
 
-        /* Hero gradient overlay */
         .hero-gradient {
             background: linear-gradient(135deg, rgba(21, 77, 222, 0.5) 0%, rgba(25, 57, 142, 0.3) 50%, rgba(0, 0, 0, 0.2) 100%);
         }
 
-        /* Shimmer loading */
         .shimmer {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
@@ -136,7 +131,6 @@
             }
         }
 
-        /* Pulse dot */
         .pulse-dot {
             animation: pulse 2s infinite;
         }
@@ -153,7 +147,6 @@
             }
         }
 
-        /* Mobile menu */
         .mobile-menu {
             transform: translateX(100%);
             transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -174,7 +167,6 @@
             pointer-events: auto;
         }
 
-        /* City autocomplete */
         .autocomplete-list {
             max-height: 200px;
             overflow-y: auto;
@@ -184,12 +176,10 @@
             background: #eef6ff;
         }
 
-        /* Smooth scroll */
         html {
             scroll-behavior: smooth;
         }
 
-        /* Footer gradient */
         .footer-gradient {
             background: linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
         }
@@ -340,7 +330,6 @@
             </div>
 
             <div id="dealsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <!-- Loading shimmer -->
                 <div class="shimmer rounded-2xl h-48"></div>
                 <div class="shimmer rounded-2xl h-48"></div>
                 <div class="shimmer rounded-2xl h-48"></div>
@@ -579,8 +568,7 @@
     <script>
         // ===== CONFIG =====
         const CONFIG = {
-            // Insert your Travelpayouts API token here:
-            API_TOKEN: 'YOUR_TOKEN_HERE',
+            API_TOKEN: '33455759bbacefe8bc09110cb398bbd9',
             API_BASE: 'https://api.travelpayouts.com',
             MARKER: '703570',
             CURRENCY: 'rub',
