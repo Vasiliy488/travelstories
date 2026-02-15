@@ -788,10 +788,9 @@
 
         // Формат даты для Aviasales: DDMM
         function formatDateForAviasales(dateStr) {
-            if (!dateStr) return '';
-            const d = new Date(dateStr);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
+            if (!dateStr || dateStr.trim() === '') return '';
+            const [year, month, day] = dateStr.split('-');
+            if (!day || !month) return '';
             return day + month;
         }
 
@@ -926,6 +925,13 @@
                 const departStr = formatDateForAviasales(deal.depart_date);
                 const returnStr = formatDateForAviasales(deal.return_date);
                 const searchLink = `https://www.aviasales.ru/search/${deal.origin}${departStr}${deal.destination}${returnStr}1?marker=${CONFIG.MARKER}`;
+                console.log('Generated Link:', { 
+                    origin: deal.origin, 
+                    dest: deal.destination, 
+                    depart: departStr, 
+                    return: returnStr, 
+                    link: searchLink 
+                });
 
                 return `
                 <div class="deal-card bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col">
