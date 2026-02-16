@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "wrangler": "^3.0.0"
+    "wrangler": "^3.114.17"
+  },
+  "dependencies": {
+    "isomorphic-git": "^1.37.1"
   }
 }
