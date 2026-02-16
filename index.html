@@ -97,7 +97,7 @@
     <div id="mobileOverlay" class="mobile-overlay fixed inset-0 bg-black/40 z-[90]" onclick="closeMobileMenu()"></div>
 
     <!-- Мобильное меню -->
-    <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white z-[100] shadow-2xl p-8 flex flex-col">
+    <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 find-us h-full bg-white z-[100] shadow-2xl p-8 flex flex-col">
         <div class="flex justify-between items-center mb-10">
             <span class="text-xl font-bold font-heading text-gray-900">Voyoge<span class="text-brand-600">Stories</span></span>
             <button onclick="closeMobileMenu()" class="p-2 hover:bg-gray-100 rounded-xl transition" aria-label="Закрыть меню">
@@ -341,6 +341,7 @@
 
     <script>
         const CONFIG = {
+            // URL прокси-сервера (GS или Worker)
             API_BASE: 'https://aviasales-proxy.brainholland64.workers.dev',
             AUTOCOMPLETE_API: 'https://autocomplete.travelpayouts.com/places2',
             MARKER: '703570',
@@ -450,25 +451,27 @@
 
         async function loadHotDeals() {
             const grid = document.getElementById('dealsGrid');
-            // Скелетоны на 8 элементов для плавности
+            // Скелетоны на 8 элементов
             grid.innerHTML = Array(8).fill(0).map(() => `<div class="shimmer rounded-3xl h-56"></div>`).join('');
 
             try {
-                // Пытаемся добавить параметры для более надежного ответа (например, начало периода)
-                const today = new Date().toISOString().split('T')[0];
-                const apiPath = `/v2/prices/latest?currency=${CONFIG.CURRENCY}&limit=8&token=${CONFIG.TOKEN}&beginning_of_period=${today}&one_way=true`;
+                // Поскольку используется GS прокси, мы передаем токен как обычный параметр запроса.
+                // Это предотвращает появление CORS ошибок, связанных с кастомными заголовками.
+                const params = new URLSearchParams({
+                    currency: CONFIG.CURRENCY,
+                    limit: '8',
+                    token: CONFIG.TOKEN,
+                    one_way: 'true'
+                });
+
+                const url = `${CONFIG.API_BASE}/v2/prices/latest?${params.toString()}`;
                 
-                const res = await fetch(`${CONFIG.API_BASE}${apiPath}`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Access-Token': CONFIG.TOKEN,
-                        'Accept': 'application/json'
-                    }
+                const res = await fetch(url, {
+                    method: 'GET'
                 });
                 
                 if (!res.ok) {
-                    console.error('API Response Status:', res.status);
-                    throw new Error(`Network response was not ok: ${res.status}`);
+                    throw new Error(`Ошибка ответа прокси: ${res.status}`);
                 }
                 
                 const data = await res.json();
@@ -503,8 +506,8 @@
                     <div class="col-span-full text-center py-10 bg-red-50 rounded-3xl border border-red-100 p-8">
                         <i data-lucide="alert-circle" class="w-10 h-10 text-red-400 mx-auto mb-4"></i>
                         <p class="text-red-800 font-semibold mb-2">Не удалось загрузить предложения</p>
-                        <p class="text-red-600 text-sm mb-6">Проверьте соединение с API или попробуйте позже.</p>
-                        <button onclick="loadHotDeals()" class="bg-red-600 text-white px-8 py-2 rounded-xl text-sm font-bold hover:bg-red-700 transition">Попробовать снова</button>
+                        <p class="text-red-600 text-sm mb-6">Сервис временно недоступен или возникла проблема с прокси-сервером.</p>
+                        <button onclick="loadHotDeals()" class="bg-red-600 text-white px-8 py-2 rounded-xl text-sm font-bold hover:bg-red-700 transition shadow-lg shadow-red-200">Попробовать снова</button>
                     </div>
                 `;
                 lucide.createIcons();
