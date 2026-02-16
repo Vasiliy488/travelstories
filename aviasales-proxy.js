@@ -114,29 +114,31 @@ export default {
 
                 const newHeaders = new Headers(request.headers);
                 newHeaders.set('X-Access-Token', env.AVIASALES_TOKEN);
+                // Prevent compression issues by asking for plain text (or letting fetch handle it implicitly by not forwarding client's preference)
+                newHeaders.delete('Accept-Encoding');
 
                 const response = await fetch(apiUrl, {
                     method: request.method,
                     headers: newHeaders
                 });
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    return new Response(`Aviasales API Error: ${response.status} ${errorText}`, { status: response.status, headers: corsHeaders });
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    try {
+                        const data = await response.json();
+                        return new Response(JSON.stringify(data), {
+                            headers: { 'Content-Type': 'application/json', ...corsHeaders }
+                        });
+                    } catch (e) {
+                        // If JSON parse fails, return text for debugging
+                        const text = await response.text();
+                        return new Response(`Invalid JSON from Aviasales: ${text.substring(0, 500)}`, { status: 502, headers: corsHeaders });
+                    }
+                } else {
+                    // Non-JSON response
+                    const text = await response.text();
+                    return new Response(text, { status: response.status, headers: { ...corsHeaders, 'Content-Type': contentType || 'text/plain' } });
                 }
-
-                const text = await response.text();
-                try {
-                    const data = JSON.parse(text);
-                    return new Response(JSON.stringify(data), {
-                        headers: { 'Content-Type': 'application/json', ...corsHeaders }
-                    });
-                } catch (e) {
-                    return new Response(`Invalid JSON from Aviasales: ${text.slice(0, 500)}`, { status: 502, headers: corsHeaders });
-                }
-                return new Response(JSON.stringify(data), {
-                    headers: { 'Content-Type': 'application/json', ...corsHeaders }
-                });
             }
 
             return new Response('Not Found', { status: 404, headers: corsHeaders });
