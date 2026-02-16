@@ -254,7 +254,10 @@ function selectCity(type, name, code) {
 
 // Закрыть автокомплит при клике вне
 document.addEventListener('click', (e) => {
-    if (!e.target.closest('.group')) {
+    // Закрываем, если клик НЕ по списку И НЕ по полям ввода
+    if (!e.target.closest('.autocomplete-list') && 
+        e.target.id !== 'inputFrom' && 
+        e.target.id !== 'inputTo') {
         document.querySelectorAll('.autocomplete-list').forEach(el => el.classList.add('hidden'));
     }
 });
@@ -419,4 +422,4 @@ lucide.createIcons();
 initDates();
 loadHotDeals();
 
-console.log('VoyogeStories Engine v1.1 — Initialized with Hot Deals Redesign ✈️');
+console.log('VoyogeStories Engine v1.1.1 — Autocomplete Fix ✈️');
