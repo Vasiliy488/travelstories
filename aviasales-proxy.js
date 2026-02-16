@@ -98,10 +98,10 @@ export default {
                 if (!searchId) return new Response('Missing search_id', { status: 400 });
 
                 const resultsUrl = `https://tickets-api.travelpayouts.com/search/affiliate/results?search_id=${searchId}`;
-                
+
                 const response = await fetch(resultsUrl);
                 const data = await response.json();
-                
+
                 return new Response(JSON.stringify(data), {
                     headers: { 'Content-Type': 'application/json', ...corsHeaders }
                 });
@@ -120,7 +120,20 @@ export default {
                     headers: newHeaders
                 });
 
-                const data = await response.json();
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    return new Response(`Aviasales API Error: ${response.status} ${errorText}`, { status: response.status, headers: corsHeaders });
+                }
+
+                const text = await response.text();
+                try {
+                    const data = JSON.parse(text);
+                    return new Response(JSON.stringify(data), {
+                        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+                    });
+                } catch (e) {
+                    return new Response(`Invalid JSON from Aviasales: ${text.slice(0, 500)}`, { status: 502, headers: corsHeaders });
+                }
                 return new Response(JSON.stringify(data), {
                     headers: { 'Content-Type': 'application/json', ...corsHeaders }
                 });
