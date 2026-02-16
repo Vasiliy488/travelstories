@@ -954,7 +954,8 @@
         function renderAutocomplete(list, cities, type) {
             list.innerHTML = cities.map(city => `
                 <div class="px-4 py-2.5 cursor-pointer text-left text-sm text-gray-700 font-medium flex justify-between items-center transition"
-                     onclick="selectCity('${type}', '${city.name}', '${city.code}')">
+                     onmousedown="selectCity('${type}', '${city.name}', '${city.code}')"
+                     onmouseup="selectCity('${type}', '${city.name}', '${city.code}')">
                     <span>${city.name}</span>
                     <span class="text-xs text-gray-400 font-mono">${city.code}</span>
                 </div>
@@ -975,7 +976,7 @@
 
         // Закрыть автокомплит при клике вне
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.group')) {
+            if (!e.target.closest('.group') && !e.target.closest('#searchForm')) {
                 document.querySelectorAll('.autocomplete-list').forEach(el => el.classList.add('hidden'));
             }
         });
