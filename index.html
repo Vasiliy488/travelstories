@@ -703,7 +703,7 @@
 
         window.handleFileUpload = async (input) => {
             const file = input.files[0];
-            if (!file || !currentUser || !isAuthor) return;
+            if (!file || !isAuthor) return; // Removed currentUser check to allow auth flow inside
 
             const status = document.getElementById('upload-status');
             const statusLabel = document.getElementById('status-label');
@@ -711,16 +711,29 @@
             statusLabel.textContent = 'Загрузка в облако...';
 
             try {
+                // Critical Fix: check if auth is initialized
+                if (!auth) {
+                    console.warn("Auth not ready, initializing...");
+                    await initSystem();
+                }
+
                 // Rule 3 Guard: Auth Before Queries
                 if (!auth.currentUser) await auth.signInAnonymously();
 
                 const publicUrl = await uploadToCloudinary(file);
 
+                // Check DB again
+                if (!db) {
+                    const fbConfig = JSON.parse(firebaseConfigStr);
+                    firebase.initializeApp(fbConfig);
+                    db = firebase.firestore();
+                }
+
                 const path = `artifacts/${CONFIG.APP_ID}/public/data/stories`;
                 await db.collection(path).add({
                     url: publicUrl,
                     type: file.type.startsWith('video') ? 'video' : 'image',
-                    timestamp: Date.now()
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp() // Use server timestamp
                 });
 
                 statusLabel.textContent = 'Успешно!';
