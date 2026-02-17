@@ -7,22 +7,15 @@
     <title>VoyogeStories — Авторские путеводители и поиск билетов</title>
     
     <!-- SEO Мета-теги -->
-    <meta name="description" content="VoyogeStories — ваш личный гид. Горящие предложения, живые истории из путешествий и умный поиск билетов среди 700+ авиакомпаний.">
-    <meta name="keywords" content="авиабилеты, поиск билетов, горящие туры, путеводители, путешествия, дешевые билеты, Стамбул, Бали, Грузия">
+    <meta name="description" content="VoyogeStories — ваш личный гид. Горящие предложения, живые истории и умный поиск билетов.">
     <link rel="canonical" href="https://voyogestories.ru">
     
-    <!-- Open Graph -->
-    <meta property="og:title" content="VoyogeStories — Поиск билетов и путеводители">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://voyogestories.ru">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=1200">
-    
-    <!-- Firebase SDK (Compat Version) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
-    <!-- Верификация Travelpayouts -->
+    <!-- Travelpayouts -->
     <script data-noptimize="1" data-cfasync="false" data-wpfc-render="false">
         (function () {
             var script = document.createElement("script");
@@ -76,7 +69,6 @@
             border-radius: 1rem; margin-top: 0.5rem;
         }
         .autocomplete-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f3f4f6; color: #111827 !important; display: flex; justify-content: space-between; align-items: center; }
-        .autocomplete-item:active { background: #f0f9ff; }
         
         .trip-toggle.active { background: #154dde; color: white; }
         .trip-toggle:not(.active) { background: #f1f5f9; color: #64748b; }
@@ -85,24 +77,41 @@
         #story-viewer video, #story-viewer img { max-height: 85vh; max-width: 100vw; border-radius: 1rem; }
         
         #admin-panel { display: none; background: #fff; border-top: 2px solid #3381fc; padding: 1.25rem; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); border-radius: 2rem 2rem 0 0; }
+        #auth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 3000; align-items: center; justify-content: center; }
         
         .scroll-container { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         #article-view { display: none; position: relative; z-index: 60; background: #fff; }
         .prose h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #111827; }
         .prose p { margin-bottom: 1.25rem; line-height: 1.7; color: #4b5563; }
-        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.25rem; }
     </style>
 </head>
 
 <body class="antialiased">
     
+    <!-- Модальное окно авторизации -->
+    <div id="auth-modal" class="p-4">
+        <div class="bg-white p-8 rounded-[2.5rem] w-full max-w-sm text-center shadow-2xl">
+            <div class="bg-brand-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-600">
+                <i data-lucide="lock" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-black mb-2">Вход для автора</h3>
+            <p class="text-sm text-gray-400 mb-6">Введите секретный код, чтобы управлять историями</p>
+            <input type="password" id="admin-password" placeholder="••••" class="w-full text-center text-2xl tracking-[0.5em] py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-300 outline-none mb-4 font-bold">
+            <div class="flex gap-2">
+                <button onclick="closeAuth()" class="flex-1 py-4 text-gray-400 font-bold">Отмена</button>
+                <button onclick="checkPassword()" class="flex-1 py-4 bg-brand-600 text-white rounded-2xl font-black shadow-lg shadow-brand-200">ВОЙТИ</button>
+            </div>
+            <p id="auth-error" class="text-red-500 text-xs mt-4 font-bold hidden">Неверный код доступа</p>
+        </div>
+    </div>
+
     <!-- Мобильное меню overlay -->
     <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-[90] opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeMobileMenu()"></div>
 
     <!-- Мобильное меню -->
     <aside id="mobileMenu" class="fixed top-0 right-0 w-80 h-full bg-white z-[100] shadow-2xl p-8 flex flex-col translate-x-full transition-transform duration-300 ease-out">
         <div class="flex justify-between items-center mb-10 text-gray-900">
-            <span class="text-xl font-bold font-heading">Voyoge<span class="text-brand-600">Stories</span></span>
+            <span class="text-xl font-bold font-heading uppercase tracking-tighter">Voyoge<span class="text-brand-600">Stories</span></span>
             <button onclick="closeMobileMenu()" class="p-2 hover:bg-gray-100 rounded-xl transition">
                 <i data-lucide="x" class="w-6 h-6 text-gray-500"></i>
             </button>
@@ -128,7 +137,7 @@
                     <span class="text-xl lg:text-2xl font-bold font-heading uppercase tracking-tighter">Voyoge<span class="text-brand-600">Stories</span></span>
                 </a>
                 <div class="flex items-center gap-3">
-                    <button id="admin-trigger" class="p-2.5 text-gray-300 hover:text-brand-600 transition" title="Режим автора">
+                    <button onclick="openAuth()" class="p-2.5 text-gray-300 hover:text-brand-600 transition" title="Вход для автора">
                         <i data-lucide="settings" class="w-5 h-5"></i>
                     </button>
                     <button onclick="window.scrollTo({top: 400, behavior: 'smooth'})" class="bg-brand-600 text-white px-6 py-2.5 rounded-full text-xs font-bold shadow-lg hover:bg-brand-700 transition hidden sm:block">Начать поиск</button>
@@ -146,21 +155,19 @@
         <section id="stories-section" class="bg-white border-b border-gray-100 py-4 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div id="stories-scroll" class="flex items-center gap-5 overflow-x-auto no-scrollbar py-2">
-                    <!-- Кнопка автора -->
                     <div id="add-story-circle" class="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer hidden" onclick="document.getElementById('hidden-file-input').click()">
                         <div class="w-16 h-16 rounded-full border-2 border-dashed border-brand-300 flex items-center justify-center bg-brand-50">
                             <i data-lucide="plus" class="w-6 h-6 text-brand-500"></i>
                         </div>
                         <span class="text-[10px] font-bold text-brand-500 uppercase tracking-tighter">Добавить</span>
                     </div>
-                    <!-- Динамический список -->
                     <div id="dynamic-stories" class="flex gap-5">
                         <div class="shimmer w-16 h-16 rounded-full"></div>
                         <div class="shimmer w-16 h-16 rounded-full"></div>
                     </div>
                 </div>
             </div>
-        </head>
+        </section>
 
         <!-- Поиск билетов -->
         <section class="relative min-h-[460px] lg:min-h-[520px] flex items-center justify-center text-center px-4 overflow-hidden">
@@ -210,8 +217,8 @@
         <!-- Слайдер Лучших Предложений (8 штук) -->
         <section id="hot-deals" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 fade-up">
             <div class="flex items-center justify-between mb-10">
-                <h2 class="text-2xl lg:text-3xl font-bold font-heading flex items-center gap-3 text-gray-900">
-                    <div class="bg-green-100 p-2.5 rounded-2xl"><i data-lucide="trending-down" class="text-green-600 w-7 h-7"></i></div>
+                <h2 class="text-2xl lg:text-3xl font-bold font-heading flex items-center gap-3 text-gray-900 text-balance">
+                    <div class="bg-green-100 p-2.5 rounded-2xl shrink-0"><i data-lucide="trending-down" class="text-green-600 w-7 h-7"></i></div>
                     Лучшие предложения
                 </h2>
                 <div class="flex gap-2">
@@ -220,18 +227,17 @@
                 </div>
             </div>
             <div id="dealsGrid" class="scroll-container flex overflow-x-auto no-scrollbar gap-6 pb-8 px-2">
-                <!-- Карточки 8 штук инжектятся через JS -->
+                <!-- Карточки -->
             </div>
         </section>
 
-        <!-- Путеводители -->
+        <!-- Путеводители (6 ШТУК) -->
         <section id="guides" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 fade-up text-gray-900">
             <h2 class="text-2xl lg:text-3xl font-bold font-heading flex items-center gap-3 mb-10">
                 <div class="bg-brand-100 p-2.5 rounded-2xl"><i data-lucide="book-open" class="text-brand-600 w-7 h-7"></i></div>
                 Путеводители и советы
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                <!-- Статья 1 -->
                 <article onclick="openArticle('istanbul')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Стамбул">
@@ -243,7 +249,6 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>12 мая</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
-                <!-- Статья 2 -->
                 <article onclick="openArticle('layovers')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Аэропорт">
@@ -255,7 +260,6 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>28 апр</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
-                <!-- Статья 3 -->
                 <article onclick="openArticle('bali')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Бали">
@@ -267,7 +271,6 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>05 мая</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
-                <!-- Статья 4 -->
                 <article onclick="openArticle('georgia')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Грузия">
@@ -279,7 +282,6 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>20 апр</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
-                <!-- Статья 5 -->
                 <article onclick="openArticle('baggage')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1553531384-397c80973a0b?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Багаж">
@@ -291,7 +293,6 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>15 апр</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
-                <!-- Статья 6 -->
                 <article onclick="openArticle('maldives')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Мальдивы">
@@ -311,10 +312,10 @@
             <h2 class="text-2xl font-black mb-8 text-gray-900 uppercase tracking-tight">VoyogeStories — ваш гид в мире выгодных авиаперелетов</h2>
             <div class="grid md:grid-cols-2 gap-10 text-sm text-gray-600 leading-relaxed">
                 <div class="space-y-4">
-                    <p>Мы предлагаем современный инструмент для поиска авиабилетов по всему миру. Наша система сканирует данные сотен авиакомпаний и лоукостеров в реальном времени, помогая вам купить дешевые билеты на самолет без лишних наценок.</p>
+                    <p>Мы предлагаем современный инструмент для поиска авиабилетов по всему миру. Наша система сканирует данные сотен авиакомпаний и лоукостеров в реальном времени.</p>
                 </div>
                 <div class="space-y-4">
-                    <p>Помимо поиска рейсов, на нашем сайте вы найдете авторские путеводители и честные советы от опытных путешественников. VoyogeStories — это не просто поиск билетов, это вдохновение для ваших новых открытий!</p>
+                    <p>Помимо поиска рейсов, на нашем сайте вы найдете авторские путеводители и честные советы от опытных путешественников. Открывайте мир вместе с нами!</p>
                 </div>
             </div>
         </section>
@@ -331,7 +332,7 @@
                         <i data-lucide="arrow-left" class="w-4 h-4"></i> Назад на главную
                     </button>
                     <div class="pt-6">
-                        <h1 id="article-title" class="text-3xl md:text-5xl lg:text-6xl font-black mb-8 leading-tight drop-shadow-xl uppercase tracking-tighter"></h1>
+                        <h1 id="article-title" class="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-8 leading-tight drop-shadow-xl uppercase tracking-tighter"></h1>
                         <div class="flex flex-wrap items-center gap-4 text-xs md:text-sm font-bold uppercase tracking-widest">
                             <span id="article-date" class="bg-brand-600 px-5 py-2.5 rounded-xl shadow-lg"></span>
                             <span id="article-category" class="bg-white/20 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white/10"></span>
@@ -343,7 +344,7 @@
         <article class="max-w-4xl mx-auto px-6 py-16 sm:py-20 text-gray-700 prose max-w-none text-left" id="article-content"></article>
     </div>
 
-    <!-- АДМИН-ПАНЕЛЬ -->
+    <!-- АДМИН-ПАНЕЛЬ (Управление загрузкой) -->
     <div id="admin-panel">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div><p class="font-black text-gray-900 text-lg uppercase tracking-tight">Режим автора</p><p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Загрузите контент в облако</p></div>
@@ -352,7 +353,7 @@
                     <i data-lucide="upload-cloud" class="w-4 h-4"></i> ВЫБРАТЬ ФАЙЛ
                     <input type="file" id="hidden-file-input" accept="video/*,image/*" class="hidden" onchange="handleFileUpload(this)">
                 </label>
-                <button onclick="toggleAdmin()" class="p-2 text-gray-400"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="toggleAdminPanel()" class="p-2 text-gray-400"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
         </div>
         <div id="upload-status" class="hidden mt-4 p-3 bg-brand-50 rounded-xl flex items-center justify-center gap-3">
@@ -371,17 +372,17 @@
                 <div class="bg-brand-600 p-2.5 rounded-2xl"><i data-lucide="compass" class="text-white w-6 h-6"></i></div>
                 <span class="text-2xl font-black uppercase tracking-tighter">Voyoge<span class="text-brand-600">Stories</span></span>
             </div>
-            <p class="text-sm text-gray-500 font-medium max-w-sm mx-auto leading-relaxed">© 2026 VoyogeStories • Данные предоставлены API Aviasales/Travelpayouts</p>
+            <p class="text-sm text-gray-500 font-medium max-w-sm mx-auto leading-relaxed">© 2026 VoyogeStories</p>
         </div>
     </footer>
 
     <script>
-        // --- FIREBASE CONFIG ---
+        // --- FIREBASE ---
         const firebaseConfig = JSON.parse(__firebase_config);
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'voyogestories-main-v2';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'voyogestories-v2';
 
         const CONFIG = {
             API_BASE: 'https://aviasales-proxy.brainholland64.workers.dev',
@@ -395,17 +396,17 @@
         };
 
         const ARTICLES_DATA = {
-            istanbul: { title: "Стамбул за 3 дня", date: "12 мая 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=1200", content: `<h2>Сердце Босфора</h2><p>Стамбул — город контрастов. Мы составили план на 3 дня...</p><ul><li>День 1: Султанахмет</li><li>День 2: Кадыкёй</li><li>День 3: Галата</li></ul>` },
-            layovers: { title: "Длинные пересадках", date: "28 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=1200", content: `<h2>Искусство пересадки</h2><p>Как превратить ожидание в отпуск...</p>` },
-            bali: { title: "Бали 2026", date: "05 мая 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=1200", content: `<h2>Остров Богов</h2><p>Визы и налоги в новом сезоне...</p>` },
-            georgia: { title: "Грузия: Тбилиси и горы", date: "20 апреля 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=1200", content: `<h2>Душа Кавказа</h2><p>Грузия — это про гостеприимство...</p>` },
-            baggage: { title: "Ручная кладь 10кг", date: "15 апреля 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1553531384-397c80973a0b?auto=format&fit=crop&q=80&w=1200", content: `<h2>Легкость в пути</h2><p>Советы по сборам...</p>` },
-            maldives: { title: "Мальдивы за 100$", date: "10 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=1200", content: `<h2>Рай доступен</h2><p>Локальные острова...</p>` }
+            istanbul: { title: "Стамбул за 3 дня", date: "12 мая 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=1200", content: `<h2>Сердце Босфора</h2><p>Стамбул — город контрастов.</p>` },
+            layovers: { title: "Как летать с длинными пересадками", date: "28 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=1200", content: `<h2>Искусство пересадки</h2><p>Как провести время в аэропорту с пользой.</p>` },
+            bali: { title: "Бали 2026", date: "05 мая 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=1200", content: `<h2>Остров Богов</h2><p>Новые правила въезда.</p>` },
+            georgia: { title: "Грузия: Тбилиси и горы", date: "20 апреля 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=1200", content: `<h2>Душа Кавказа</h2><p>Грузинское гостеприимство.</p>` },
+            baggage: { title: "Ручная кладь 10 кг", date: "15 апреля 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1553531384-397c80973a0b?auto=format&fit=crop&q=80&w=1200", content: `<h2>Легкость</h2><p>Как упаковать всё необходимое.</p>` },
+            maldives: { title: "Мальдивы за 100$", date: "10 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=1200", content: `<h2>Рай доступен</h2><p>Бюджетный отдых на островах.</p>` }
         };
 
-        let selectedFrom = null, selectedTo = null, tripType = 'roundtrip', currentUser = null;
+        let selectedFrom = null, selectedTo = null, tripType = 'roundtrip', currentUser = null, isAuthor = false;
 
-        // --- ЛОГИКА ИСТОРИЙ & AUTH ---
+        // --- AUTH & STORIES ---
         async function initAuthAndStories() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -423,9 +424,7 @@
                             snap.forEach(doc => stories.push({ id: doc.id, ...doc.data() }));
                             stories.sort((a, b) => b.timestamp - a.timestamp);
                             renderStories(stories);
-                        }, (err) => {
-                            console.error("SNAPSHOT_ERROR:", err);
-                        });
+                        }, (err) => console.error("SNAPSHOT_ERROR:", err));
                     }
                 });
             } catch (e) { console.error("AUTH_FAILED:", e); }
@@ -442,14 +441,14 @@
                     <div class="story-ring w-16 h-16 rounded-full"><div class="w-full h-full rounded-full border-2 border-white overflow-hidden bg-gray-100">
                         ${s.type === 'video' ? `<video src="${s.url}" class="w-full h-full object-cover"></video>` : `<img src="${s.url}" class="w-full h-full object-cover">`}
                     </div></div>
-                    <span class="text-[10px] font-bold text-gray-700">Автор</span>
+                    <span class="text-[10px] font-bold text-gray-700">Live</span>
                 </div>
             `).join('');
         }
 
         async function handleFileUpload(input) {
             const file = input.files[0];
-            if (!file || !currentUser) return;
+            if (!file || !currentUser || !isAuthor) return;
             document.getElementById('upload-status').classList.remove('hidden');
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -462,15 +461,36 @@
                         timestamp: Date.now()
                     });
                     document.getElementById('upload-status').classList.add('hidden');
-                    toggleAdmin();
-                } catch (e) { 
-                    console.error("UPLOAD_ERROR:", e);
-                    document.getElementById('upload-status').classList.add('hidden'); 
-                }
+                    toggleAdminPanel();
+                } catch (e) { document.getElementById('upload-status').classList.add('hidden'); }
             };
         }
 
-        // --- UI LOGIC ---
+        // --- АВТОРИЗАЦИЯ АВТОРА ---
+        function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
+        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+        
+        function checkPassword() {
+            const pass = document.getElementById('admin-password').value;
+            if(pass === '1234') { // ПАРОЛЬ ПО УМОЛЧАНИЮ
+                isAuthor = true;
+                closeAuth();
+                document.getElementById('add-story-circle').classList.remove('hidden');
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('stories-section').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                const err = document.getElementById('auth-error');
+                err.classList.remove('hidden');
+                setTimeout(() => err.classList.add('hidden'), 2000);
+            }
+        }
+
+        function toggleAdminPanel() {
+            const p = document.getElementById('admin-panel');
+            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // --- UI ---
         function showView(view) {
             document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
             document.getElementById('article-view').style.display = view === 'article' ? 'block' : 'none';
@@ -494,24 +514,11 @@
             document.getElementById('dealsGrid').scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
         }
 
-        function toggleAdmin() {
-            const p = document.getElementById('admin-panel');
-            const isVisible = p.style.display === 'block';
-            p.style.display = isVisible ? 'none' : 'block';
-            document.getElementById('add-story-circle').classList.toggle('hidden', isVisible);
-            if (!isVisible) {
-                document.getElementById('stories-section').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
         function viewStory(url, type) {
             const viewer = document.getElementById('story-viewer');
             viewer.style.display = 'flex';
-            document.getElementById('story-content').innerHTML = type === 'video' 
-                ? `<video src="${url}" autoplay playsinline controls class="h-full"></video>` 
-                : `<img src="${url}" class="h-full object-contain">`;
+            document.getElementById('story-content').innerHTML = type === 'video' ? `<video src="${url}" autoplay playsinline controls class="h-full"></video>` : `<img src="${url}" class="h-full object-contain">`;
         }
-
         function closeStory() { document.getElementById('story-viewer').style.display = 'none'; }
 
         function toggleTripType(type) {
@@ -520,14 +527,13 @@
             document.getElementById('btnOneWay').classList.toggle('active', type === 'oneway');
             const retEl = document.getElementById('returnDateField');
             retEl.style.opacity = type === 'oneway' ? '0' : '1';
-            retEl.style.pointerEvents = type === 'oneway' ? 'none' : 'auto';
         }
 
-        // --- API & SEARCH ---
-        function formatDateForAviasales(dateStr) {
+        // --- SEARCH & API ---
+        function formatDate(dateStr) {
             if (!dateStr) return '';
             const p = dateStr.split('-');
-            return p[2] + p[1]; // ддмм
+            return p[2] + p[1];
         }
 
         async function loadHotDeals() {
@@ -536,16 +542,16 @@
                 const data = await res.json();
                 if (data.data) {
                     document.getElementById('dealsGrid').innerHTML = data.data.map(d => {
-                        const dep = formatDateForAviasales(d.depart_date);
-                        const ret = d.return_date ? formatDateForAviasales(d.return_date) : '';
+                        const dep = formatDate(d.depart_date);
+                        const ret = d.return_date ? formatDate(d.return_date) : '';
                         const searchPath = `${d.origin}${dep}${d.destination}${ret}1`;
                         return `
-                            <div class="deal-card bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col">
+                            <div class="deal-card bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col text-gray-900">
                                 <div class="flex justify-between mb-5">
-                                    <div class="bg-brand-50 p-2.5 rounded-xl text-brand-600"><i data-lucide="plane"></i></div>
+                                    <div class="bg-brand-50 p-2.5 rounded-xl text-brand-600 shrink-0"><i data-lucide="plane"></i></div>
                                     <span class="text-green-600 font-black text-xl">${d.value.toLocaleString()} ₽</span>
                                 </div>
-                                <h3 class="font-bold text-gray-900 mb-1 leading-snug">${CITY_NAMES[d.origin] || d.origin} → ${CITY_NAMES[d.destination] || d.destination}</h3>
+                                <h3 class="font-bold text-gray-800 mb-1 leading-snug">${CITY_NAMES[d.origin] || d.origin} → ${CITY_NAMES[d.destination] || d.destination}</h3>
                                 <p class="text-xs text-gray-400 mb-6 flex-1 font-bold uppercase tracking-wider">${new Date(d.depart_date).toLocaleDateString('ru-RU', {month: 'long', day: 'numeric'})}</p>
                                 <a href="https://www.aviasales.ru/search/${searchPath}?marker=${CONFIG.MARKER}" target="_blank" class="block py-3.5 bg-brand-50 text-brand-700 rounded-2xl text-center font-black text-xs hover:bg-brand-600 hover:text-white transition active:scale-95 uppercase tracking-widest">Билеты</a>
                             </div>
@@ -572,20 +578,12 @@
         function searchFlights() {
             const from = document.getElementById('inputFrom').value;
             const to = document.getElementById('inputTo').value;
-            const d1 = formatDateForAviasales(document.getElementById('inputDateDepart').value);
+            const d1 = formatDate(document.getElementById('inputDateDepart').value);
             if(from && to) window.open(`https://www.aviasales.ru/search/${from}${d1}${to}1?marker=${CONFIG.MARKER}`, '_blank');
         }
 
-        function openMobileMenu() {
-            document.getElementById('mobileMenu').classList.remove('translate-x-full');
-            document.getElementById('mobileOverlay').classList.replace('opacity-0', 'opacity-100');
-            document.getElementById('mobileOverlay').classList.remove('pointer-events-none');
-        }
-        function closeMobileMenu() {
-            document.getElementById('mobileMenu').classList.add('translate-x-full');
-            document.getElementById('mobileOverlay').classList.replace('opacity-100', 'opacity-0');
-            document.getElementById('mobileOverlay').classList.add('pointer-events-none');
-        }
+        function openMobileMenu() { document.getElementById('mobileMenu').classList.remove('translate-x-full'); document.getElementById('mobileOverlay').classList.replace('opacity-0', 'opacity-100'); document.getElementById('mobileOverlay').classList.remove('pointer-events-none'); }
+        function closeMobileMenu() { document.getElementById('mobileMenu').classList.add('translate-x-full'); document.getElementById('mobileOverlay').classList.replace('opacity-100', 'opacity-0'); document.getElementById('mobileOverlay').classList.add('pointer-events-none'); }
 
         window.onload = () => {
             lucide.createIcons();
@@ -595,7 +593,6 @@
             document.getElementById('inputDateReturn').valueAsDate = weekLater;
             loadHotDeals();
             initAuthAndStories();
-            document.getElementById('admin-trigger').onclick = toggleAdmin;
             const obs = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('visible')), {threshold: 0.05});
             document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
         };
