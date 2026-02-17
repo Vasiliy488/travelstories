@@ -143,22 +143,24 @@
     <!-- ГЛАВНЫЙ ЭКРАН -->
     <div id="home-view">
         <!-- Секция Историй -->
-        <section class="bg-white border-b border-gray-100 py-4 overflow-hidden">
+        <section id="stories-section" class="bg-white border-b border-gray-100 py-4 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div id="stories-scroll" class="flex items-center gap-5 overflow-x-auto no-scrollbar py-2">
-                    <div id="add-story-circle" class="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer" onclick="toggleAdmin()">
+                    <!-- Кнопка автора -->
+                    <div id="add-story-circle" class="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer hidden" onclick="document.getElementById('hidden-file-input').click()">
                         <div class="w-16 h-16 rounded-full border-2 border-dashed border-brand-300 flex items-center justify-center bg-brand-50">
                             <i data-lucide="plus" class="w-6 h-6 text-brand-500"></i>
                         </div>
-                        <span class="text-[10px] font-bold text-brand-500">Добавить</span>
+                        <span class="text-[10px] font-bold text-brand-500 uppercase tracking-tighter">Добавить</span>
                     </div>
+                    <!-- Динамический список -->
                     <div id="dynamic-stories" class="flex gap-5">
                         <div class="shimmer w-16 h-16 rounded-full"></div>
                         <div class="shimmer w-16 h-16 rounded-full"></div>
                     </div>
                 </div>
             </div>
-        </section>
+        </head>
 
         <!-- Поиск билетов -->
         <section class="relative min-h-[460px] lg:min-h-[520px] flex items-center justify-center text-center px-4 overflow-hidden">
@@ -229,6 +231,7 @@
                 Путеводители и советы
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Статья 1 -->
                 <article onclick="openArticle('istanbul')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Стамбул">
@@ -240,6 +243,7 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>12 мая</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
+                <!-- Статья 2 -->
                 <article onclick="openArticle('layovers')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Аэропорт">
@@ -251,6 +255,7 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>28 апр</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
+                <!-- Статья 3 -->
                 <article onclick="openArticle('bali')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Бали">
@@ -262,6 +267,7 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>05 мая</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
+                <!-- Статья 4 -->
                 <article onclick="openArticle('georgia')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Грузия">
@@ -273,6 +279,7 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>20 апр</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
+                <!-- Статья 5 -->
                 <article onclick="openArticle('baggage')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1553531384-397c80973a0b?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Багаж">
@@ -284,6 +291,7 @@
                         <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>15 апр</span><span class="text-brand-600">Читать →</span></div>
                     </div>
                 </article>
+                <!-- Статья 6 -->
                 <article onclick="openArticle('maldives')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Мальдивы">
@@ -342,7 +350,7 @@
             <div class="flex items-center gap-3">
                 <label class="cursor-pointer bg-brand-600 text-white px-6 py-3 rounded-2xl font-black text-xs shadow-xl active:scale-95 transition-transform flex items-center gap-2">
                     <i data-lucide="upload-cloud" class="w-4 h-4"></i> ВЫБРАТЬ ФАЙЛ
-                    <input type="file" accept="video/*,image/*" class="hidden" onchange="handleFileUpload(this)">
+                    <input type="file" id="hidden-file-input" accept="video/*,image/*" class="hidden" onchange="handleFileUpload(this)">
                 </label>
                 <button onclick="toggleAdmin()" class="p-2 text-gray-400"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
@@ -373,7 +381,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'voyogestories-v2';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'voyogestories-main-v2';
 
         const CONFIG = {
             API_BASE: 'https://aviasales-proxy.brainholland64.workers.dev',
@@ -387,10 +395,10 @@
         };
 
         const ARTICLES_DATA = {
-            istanbul: { title: "Стамбул за 3 дня", date: "12 мая 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=1200", content: `<h2>Сердце Босфора</h2><p>Стамбул — город контрастов. Мы составили план на 3 дня...</p>` },
-            layovers: { title: "Длинные пересадки", date: "28 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=1200", content: `<h2>Искусство пересадки</h2><p>Как превратить ожидание в отпуск...</p>` },
+            istanbul: { title: "Стамбул за 3 дня", date: "12 мая 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=1200", content: `<h2>Сердце Босфора</h2><p>Стамбул — город контрастов. Мы составили план на 3 дня...</p><ul><li>День 1: Султанахмет</li><li>День 2: Кадыкёй</li><li>День 3: Галата</li></ul>` },
+            layovers: { title: "Длинные пересадках", date: "28 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=1200", content: `<h2>Искусство пересадки</h2><p>Как превратить ожидание в отпуск...</p>` },
             bali: { title: "Бали 2026", date: "05 мая 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=1200", content: `<h2>Остров Богов</h2><p>Визы и налоги в новом сезоне...</p>` },
-            georgia: { title: "Грузия за неделю", date: "20 апреля 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=1200", content: `<h2>Душа Кавказа</h2><p>Тбилиси и Казбеги...</p>` },
+            georgia: { title: "Грузия: Тбилиси и горы", date: "20 апреля 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=1200", content: `<h2>Душа Кавказа</h2><p>Грузия — это про гостеприимство...</p>` },
             baggage: { title: "Ручная кладь 10кг", date: "15 апреля 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1553531384-397c80973a0b?auto=format&fit=crop&q=80&w=1200", content: `<h2>Легкость в пути</h2><p>Советы по сборам...</p>` },
             maldives: { title: "Мальдивы за 100$", date: "10 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=1200", content: `<h2>Рай доступен</h2><p>Локальные острова...</p>` }
         };
@@ -400,7 +408,6 @@
         // --- ЛОГИКА ИСТОРИЙ & AUTH ---
         async function initAuthAndStories() {
             try {
-                // ПРИНЦИП 3: Авторизация перед запросами
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await auth.signInWithCustomToken(__initial_auth_token);
                 } else {
@@ -421,9 +428,7 @@
                         });
                     }
                 });
-            } catch (e) { 
-                console.error("AUTH_FAILED:", e); 
-            }
+            } catch (e) { console.error("AUTH_FAILED:", e); }
         }
 
         function renderStories(stories) {
@@ -437,7 +442,7 @@
                     <div class="story-ring w-16 h-16 rounded-full"><div class="w-full h-full rounded-full border-2 border-white overflow-hidden bg-gray-100">
                         ${s.type === 'video' ? `<video src="${s.url}" class="w-full h-full object-cover"></video>` : `<img src="${s.url}" class="w-full h-full object-cover">`}
                     </div></div>
-                    <span class="text-[10px] font-bold text-gray-700">Live</span>
+                    <span class="text-[10px] font-bold text-gray-700">Автор</span>
                 </div>
             `).join('');
         }
@@ -491,11 +496,17 @@
 
         function toggleAdmin() {
             const p = document.getElementById('admin-panel');
-            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+            const isVisible = p.style.display === 'block';
+            p.style.display = isVisible ? 'none' : 'block';
+            document.getElementById('add-story-circle').classList.toggle('hidden', isVisible);
+            if (!isVisible) {
+                document.getElementById('stories-section').scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
         function viewStory(url, type) {
-            document.getElementById('story-viewer').style.display = 'flex';
+            const viewer = document.getElementById('story-viewer');
+            viewer.style.display = 'flex';
             document.getElementById('story-content').innerHTML = type === 'video' 
                 ? `<video src="${url}" autoplay playsinline controls class="h-full"></video>` 
                 : `<img src="${url}" class="h-full object-contain">`;
@@ -513,10 +524,10 @@
         }
 
         // --- API & SEARCH ---
-        function formatDate(dateStr) {
+        function formatDateForAviasales(dateStr) {
             if (!dateStr) return '';
             const p = dateStr.split('-');
-            return p[2] + p[1];
+            return p[2] + p[1]; // ддмм
         }
 
         async function loadHotDeals() {
@@ -525,8 +536,8 @@
                 const data = await res.json();
                 if (data.data) {
                     document.getElementById('dealsGrid').innerHTML = data.data.map(d => {
-                        const dep = formatDate(d.depart_date);
-                        const ret = d.return_date ? formatDate(d.return_date) : '';
+                        const dep = formatDateForAviasales(d.depart_date);
+                        const ret = d.return_date ? formatDateForAviasales(d.return_date) : '';
                         const searchPath = `${d.origin}${dep}${d.destination}${ret}1`;
                         return `
                             <div class="deal-card bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col">
@@ -561,7 +572,7 @@
         function searchFlights() {
             const from = document.getElementById('inputFrom').value;
             const to = document.getElementById('inputTo').value;
-            const d1 = formatDate(document.getElementById('inputDateDepart').value);
+            const d1 = formatDateForAviasales(document.getElementById('inputDateDepart').value);
             if(from && to) window.open(`https://www.aviasales.ru/search/${from}${d1}${to}1?marker=${CONFIG.MARKER}`, '_blank');
         }
 
