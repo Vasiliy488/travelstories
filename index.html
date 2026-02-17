@@ -607,19 +607,18 @@
                 if (!firebaseConfigStr) {
                     console.warn("Firebase config not found. Running in offline/mock mode.");
 
-                    // --- MOCK FIREBASE ---
-                    auth = {
+                    // --- GLOBAL MOCK AUTH & DB ---
+                    window.auth = auth = {
                         currentUser: null,
                         signInAnonymously: async () => {
                             auth.currentUser = { uid: 'mock_user' };
                             return { user: auth.currentUser };
                         },
                         onAuthStateChanged: (cb) => {
-                            // Simulate delayed login
                             setTimeout(() => {
                                 auth.currentUser = { uid: 'mock_user' };
                                 cb(auth.currentUser);
-                            }, 500);
+                            }, 100);
                             return () => { };
                         },
                         signInWithCustomToken: async () => { }
@@ -629,11 +628,10 @@
                         try { return JSON.parse(localStorage.getItem('voyoge_stories')) || []; } catch (e) { return []; }
                     };
 
-                    db = {
+                    window.db = db = {
                         collection: (path) => ({
                             onSnapshot: (cb, errCb) => {
                                 const currentStories = loadLocalStories();
-                                // Simulate snapshot
                                 const mockDocs = currentStories.map((s, i) => ({ id: 'mock_' + i, data: () => s }));
                                 cb({ docs: mockDocs });
                                 return () => { };
@@ -658,38 +656,89 @@
                     return;
                 }
 
-                const fbConfig = JSON.parse(firebaseConfigStr);
-                firebase.initializeApp(fbConfig);
-                db = firebase.firestore();
-                auth = firebase.auth();
+                // --- MOCK FIREBASE ---
+                auth = {
+                    currentUser: null,
+                    signInAnonymously: async () => {
+                        auth.currentUser = { uid: 'mock_user' };
+                        return { user: auth.currentUser };
+                    },
+                    onAuthStateChanged: (cb) => {
+                        // Simulate delayed login
+                        setTimeout(() => {
+                            auth.currentUser = { uid: 'mock_user' };
+                            cb(auth.currentUser);
+                        }, 500);
+                        return () => { };
+                    },
+                    signInWithCustomToken: async () => { }
+                };
 
-                // Rule 3: Auth FIRST and wait
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await auth.signInWithCustomToken(__initial_auth_token);
-                } else {
-                    await auth.signInAnonymously();
-                }
+                const loadLocalStories = () => {
+                    try { return JSON.parse(localStorage.getItem('voyoge_stories')) || []; } catch (e) { return []; }
+                };
 
-                // Guarded operations after auth confirmation
-                auth.onAuthStateChanged(user => {
-                    currentUser = user;
+                db = {
+                    collection: (path) => ({
+                        onSnapshot: (cb, errCb) => {
+                            const currentStories = loadLocalStories();
+                            // Simulate snapshot
+                            const mockDocs = currentStories.map((s, i) => ({ id: 'mock_' + i, data: () => s }));
+                            cb({ docs: mockDocs });
+                            return () => { };
+                        },
+                        add: async (data) => {
+                            console.log("Mock DB Adding:", data);
+                            const currentStories = loadLocalStories();
+                            currentStories.unshift(data);
+                            localStorage.setItem('voyoge_stories', JSON.stringify(currentStories.slice(0, 20)));
+                            return { id: 'mock_' + Date.now() };
+                        }
+                    })
+                };
+
+                // Initial render for mock mode
+                auth.onAuthStateChanged((user) => {
                     if (user) {
-                        const path = `artifacts/${CONFIG.APP_ID}/public/data/stories`;
-                        // Instruction: Error callback required for snapshot listener
-                        db.collection(path).onSnapshot(snap => {
-                            const stories = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            stories.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                            renderStoriesUI(stories);
-                        }, err => {
-                            console.error("Firestore Listen Error:", err);
-                            const container = document.getElementById('dynamic-stories');
-                            container.innerHTML = '<span class="text-[10px] text-red-300 font-bold py-6 uppercase italic">Ошибка доступа к облаку</span>';
-                        });
+                        const stories = loadLocalStories();
+                        renderStoriesUI(stories);
                     }
                 });
-            } catch (e) {
-                console.error("System Init Error:", e);
+                return;
             }
+
+                const fbConfig = JSON.parse(firebaseConfigStr);
+            firebase.initializeApp(fbConfig);
+            db = firebase.firestore();
+            auth = firebase.auth();
+
+            // Rule 3: Auth FIRST and wait
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await auth.signInWithCustomToken(__initial_auth_token);
+            } else {
+                await auth.signInAnonymously();
+            }
+
+            // Guarded operations after auth confirmation
+            auth.onAuthStateChanged(user => {
+                currentUser = user;
+                if (user) {
+                    const path = `artifacts/${CONFIG.APP_ID}/public/data/stories`;
+                    // Instruction: Error callback required for snapshot listener
+                    db.collection(path).onSnapshot(snap => {
+                        const stories = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        stories.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                        renderStoriesUI(stories);
+                    }, err => {
+                        console.error("Firestore Listen Error:", err);
+                        const container = document.getElementById('dynamic-stories');
+                        container.innerHTML = '<span class="text-[10px] text-red-300 font-bold py-6 uppercase italic">Ошибка доступа к облаку</span>';
+                    });
+                }
+            });
+        } catch (e) {
+            console.error("System Init Error:", e);
+        }
         };
 
         function renderStoriesUI(stories) {
