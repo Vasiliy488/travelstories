@@ -85,7 +85,7 @@
             <input type="password" id="admin-password" placeholder="••••" class="w-full text-center text-2xl tracking-[0.5em] py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-300 outline-none mb-4 font-bold">
             <div class="flex gap-2">
                 <button onclick="closeAuth()" class="flex-1 py-4 text-gray-400 font-bold hover:text-gray-600 transition">Отмена</button>
-                <button onclick="checkPassword()" class="flex-1 py-4 bg-brand-600 text-white rounded-2xl font-black shadow-lg">ВОЙТИ</button>
+                <button onclick="checkPassword()" class="flex-1 py-4 bg-brand-600 text-white rounded-2xl font-black shadow-lg active:scale-95 transition-transform">ВОЙТИ</button>
             </div>
             <p id="auth-error" class="text-red-500 text-xs mt-4 font-bold hidden">Неверный код доступа</p>
         </div>
@@ -112,10 +112,11 @@
                 <div id="stories-scroll" class="flex items-center gap-5 overflow-x-auto no-scrollbar py-2">
                     <div id="add-story-circle" class="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer hidden" onclick="document.getElementById('hidden-file-input').click()">
                         <div class="w-16 h-16 rounded-full border-2 border-dashed border-brand-300 flex items-center justify-center bg-brand-50"><i data-lucide="plus" class="w-6 h-6 text-brand-500"></i></div>
-                        <span class="text-[10px] font-bold text-brand-500 uppercase">Добавить</span>
+                        <span class="text-[10px] font-bold text-brand-500 uppercase tracking-tighter">Добавить</span>
                     </div>
                     <div id="dynamic-stories" class="flex gap-5">
-                        <!-- Динамический контент -->
+                        <div class="shimmer w-16 h-16 rounded-full flex-shrink-0"></div>
+                        <div class="shimmer w-16 h-16 rounded-full flex-shrink-0"></div>
                     </div>
                 </div>
             </div>
@@ -139,14 +140,14 @@
                                 <i data-lucide="plane-takeoff" class="w-5 h-5 text-gray-400"></i>
                                 <input id="inputFrom" type="text" placeholder="Откуда" oninput="handleAutocompleteInput(event, 'from')" autocomplete="off" class="w-full py-3 bg-transparent outline-none text-sm font-bold">
                             </div>
-                            <div id="autocompleteFrom" class="autocomplete-list hidden"></div>
+                            <div id="autocompleteFrom" class="autocomplete-list hidden text-left"></div>
                         </div>
                         <div class="relative flex-1 text-left">
                             <div class="flex items-center gap-3 px-4 py-1.5 bg-gray-50 rounded-2xl border border-gray-100 text-gray-900 focus-within:border-brand-300">
                                 <i data-lucide="plane-landing" class="w-5 h-5 text-gray-400"></i>
                                 <input id="inputTo" type="text" placeholder="Куда" oninput="handleAutocompleteInput(event, 'to')" autocomplete="off" class="w-full py-3 bg-transparent outline-none text-sm font-bold">
                             </div>
-                            <div id="autocompleteTo" class="autocomplete-list hidden"></div>
+                            <div id="autocompleteTo" class="autocomplete-list hidden text-left"></div>
                         </div>
                         <button onclick="searchFlights()" class="bg-brand-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-brand-700 transition shadow-lg">НАЙТИ</button>
                     </div>
@@ -159,7 +160,7 @@
         </section>
 
         <!-- Hot Deals Slider -->
-        <section id="hot-deals" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-gray-900">
+        <section id="hot-deals" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-gray-900 text-center">
             <div class="flex items-center justify-between mb-10 text-gray-900">
                 <h2 class="text-2xl lg:text-3xl font-bold font-heading flex items-center gap-3">
                     <div class="bg-green-100 p-2.5 rounded-2xl shrink-0"><i data-lucide="trending-down" class="text-green-600 w-7 h-7"></i></div>
@@ -171,7 +172,7 @@
                 </div>
             </div>
             <div id="dealsGrid" class="scroll-container flex overflow-x-auto no-scrollbar gap-6 pb-8 px-2 text-left">
-                <!-- Карточки загрузятся скриптом -->
+                <!-- Карточки 8 штук -->
             </div>
         </section>
 
@@ -184,7 +185,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 <article onclick="openArticle('istanbul')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
                     <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Стамбул"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-brand-600 uppercase">Маршрут</div></div>
-                    <div class="p-8 flex-1 flex flex-col"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading">Стамбул за 3 дня</h3><p class="text-sm text-gray-500 line-clamp-2">Идеальный план для первого знакомства с городом.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>12 мая</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
+                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance">Стамбул за 3 дня</h3><p class="text-sm text-gray-500 line-clamp-2">Идеальный план для первого знакомства с городом.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>12 мая</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
                 </article>
                 <article onclick="openArticle('layovers')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
                     <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Аэропорт"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-green-600 uppercase">Экономия</div></div>
@@ -192,7 +193,7 @@
                 </article>
                 <article onclick="openArticle('bali')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
                     <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Бали"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-accent-600 uppercase">Лайфхак</div></div>
-                    <div class="p-8 flex-1 flex flex-col"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance">Бали 2026: Гайд</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">Новые правила въезда, визы и налоги в этом году.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>05 мая</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
+                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance">Бали 2026: Новые правила</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">Все о визах, налогах и транспорте на острове.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>05 мая</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
                 </article>
                 <article onclick="openArticle('georgia')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
                     <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Грузия"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-brand-600 uppercase">Маршрут</div></div>
@@ -204,7 +205,7 @@
                 </article>
                 <article onclick="openArticle('maldives')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
                     <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Мальдивы"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-green-600 uppercase">Экономия</div></div>
-                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance uppercase">Мальдивы за 100$</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">Райский отдых на локальных островах.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase"><span>10 апр</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
+                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance uppercase">Мальдивы за 100$</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium text-balance">Райский отдых на локальных островах Мальдив.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>10 апр</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
                 </article>
             </div>
         </section>
@@ -213,7 +214,7 @@
         <section id="seo-section" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 bg-white border border-gray-100 rounded-[3rem] mb-20 text-gray-900">
             <h2 class="text-2xl font-black mb-8 uppercase tracking-tight text-left font-heading">VoyogeStories — ваш гид в мире выгодных авиаперелетов</h2>
             <div class="grid md:grid-cols-2 gap-10 text-sm text-gray-600 leading-relaxed text-left font-medium">
-                <p>Мы предлагаем современный инструмент для поиска авиабилетов по всему миру. Наша система сканирует данные сотен авиакомпаний в реальном времени, помогая вам купить дешевые билеты на самолет без наценок и скрытых комиссий.</p>
+                <p>Мы предлагаем современный инструмент для поиска авиабилетов по всему миру. Наша система сканирует данные сотен авиакомпаний и лоукостеров в реальном времени, помогая вам купить дешевые билеты на самолет без наценок и скрытых комиссий.</p>
                 <p>Помимо поиска рейсов, на нашем сайте вы найдете авторские путеводители от опытных путешественников. VoyogeStories — это вдохновение для ваших новых открытий!</p>
             </div>
         </section>
@@ -226,26 +227,26 @@
             <div class="flex items-center gap-3">
                 <label class="cursor-pointer bg-brand-600 text-white px-6 py-3 rounded-2xl font-black text-xs shadow-xl active:scale-95 flex items-center gap-2 transition-all">
                     <i data-lucide="upload-cloud" class="w-4 h-4"></i> ВЫБРАТЬ ФАЙЛ
-                    <input type="file" id="hidden-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileUpload(this)">
+                    <input type="file" id="hidden-file-input" accept="image/*,video/*" class="hidden" onchange="window.handleFileUpload(this)">
                 </label>
-                <button onclick="toggleAdminPanel()" class="p-2 text-gray-400 hover:text-gray-900"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="window.toggleAdminPanel()" class="p-2 text-gray-400 hover:text-gray-900"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
         </div>
         <div id="upload-status" class="hidden mt-4 p-3 bg-brand-50 rounded-xl flex items-center justify-center gap-3 text-gray-900 font-bold text-center">
             <div class="animate-spin text-brand-600"><i data-lucide="refresh-cw" class="w-4 h-4"></i></div>
-            <span id="status-label" class="text-xs uppercase italic">Отправка в облако...</span>
+            <span id="status-label" class="text-xs uppercase italic">Подготовка...</span>
         </div>
     </div>
 
     <!-- Viewers -->
     <div id="article-view" class="p-6">
         <div class="max-w-4xl mx-auto text-gray-900 text-left">
-            <button onclick="showView('home')" class="mb-8 font-bold flex items-center gap-2 text-brand-600 hover:text-brand-700 transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i> Назад</button>
+            <button onclick="window.showView('home')" class="mb-8 font-bold flex items-center gap-2 text-brand-600 hover:text-brand-700 transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i> Назад</button>
             <h1 id="article-title-view" class="text-3xl md:text-5xl font-black mb-10 leading-tight font-heading uppercase tracking-tighter"></h1>
             <div id="article-content-view" class="prose prose-blue max-w-none text-gray-700"></div>
         </div>
     </div>
-    <div id="story-viewer" onclick="closeStory()">
+    <div id="story-viewer" onclick="window.closeStory()">
         <div id="story-content" class="w-full h-full flex items-center justify-center p-2 text-white"></div>
     </div>
 
@@ -268,65 +269,66 @@
         };
 
         const ARTICLES_DATA = {
-            istanbul: { title: "Стамбул за 3 дня", content: "<h2>Сердце Босфора</h2><p>Стамбул — это город, в котором Восток встречается с Западом. За три дня вы успеете посетить главные мечети, прокатиться на пароме по Босфору и попробовать легендарный стритфуд.</p>" },
+            istanbul: { title: "Стамбул за 3 дня", content: "<h2>Сердце Босфора</h2><p>Стамбул — это город, в котором Восток встречается с Западом. За три дня вы успеете посетить главные мечети, прокатиться на пароме по Босфору и попробовать легендарный стритфуд.</p><ul><li>Айя-София и Голубая мечеть</li><li>Прогулка по Босфору на пароме</li><li>Галатская башня и Истикляль</li></ul>" },
             layovers: { title: "Длинные пересадки", content: "<h2>Искусство пересадки</h2><p>Длинная стыковка — это возможность увидеть новую страну бесплатно. Пользуйтесь программами Stopover от крупных авиакомпаний и бронируйте бизнес-залы.</p>" },
             bali: { title: "Бали 2026", content: "<h2>Остров Богов</h2><p>Новые правила въезда, визы и налоги в 2026 году. Помните о международном водительском удостоверении и новых налогах для туристов.</p>" },
             georgia: { title: "Грузия за неделю", content: "<h2>Душа Кавказа</h2><p>Грузия — это гостеприимство, вино и невероятные горы. Маршрут включает Тбилиси, Казбеги и Кахетию.</p>" },
-            baggage: { title: "Жизнь в 10 кг", content: "<h2>Легкость в пути</h2><p>Советы по сборам: как уместить всё необходимое в 10 кг и не платить за багаж лоукостерам.</p>" },
+            baggage: { title: "Ручная кладь 10 кг", content: "<h2>Легкость в пути</h2><p>Советы по сборам: как уместить всё необходимое в 10 кг и не платить за багаж лоукостерам. Используйте вакуумные пакеты.</p>" },
             maldives: { title: "Мальдивы за 100$", content: "<h2>Рай доступен</h2><p>Бюджетный отдых на локальных островах Мальдив (Маафуши, Тодду). Лазурная вода без переплат.</p>" }
         };
 
         const CITY_NAMES = { 'MOW': 'Москва', 'LED': 'Санкт-Петербург', 'IST': 'Стамбул', 'DXB': 'Дубай', 'HKT': 'Пхукет', 'DPS': 'Бали', 'TBS': 'Тбилиси' };
 
-        // --- FIREBASE & CLOUDINARY ---
+        // --- FIREBASE & CLOUDINARY LOGIC ---
         let db, auth, currentUser, isAuthor = false;
+
+        // Вставьте свои настройки Firebase ниже для работы на GitHub:
+        // const myFirebaseConfig = { ... };
 
         const initSystem = async () => {
             try {
-                if (!firebaseConfigStr) {
-                    console.warn("Firebase config not found. Running in offline mode.");
-                    renderStoriesUI([]);
+                let fbConfig;
+                if (firebaseConfigStr) {
+                    fbConfig = JSON.parse(firebaseConfigStr);
+                } else if (typeof myFirebaseConfig !== 'undefined') {
+                    fbConfig = myFirebaseConfig;
+                } else {
+                    console.warn("Firebase config not found.");
+                    document.getElementById('dynamic-stories').innerHTML = '<p class="text-[10px] text-gray-300 font-bold py-6 italic uppercase">Настройте Firebase для работы</p>';
                     return;
                 }
 
-                const fbConfig = JSON.parse(firebaseConfigStr);
                 firebase.initializeApp(fbConfig);
                 db = firebase.firestore();
                 auth = firebase.auth();
                 
-                // Rule 3: Auth FIRST and wait
+                // Rule 3: Auth First
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await auth.signInWithCustomToken(__initial_auth_token);
                 } else {
                     await auth.signInAnonymously();
                 }
 
-                // Guarded operations after auth confirmation
                 auth.onAuthStateChanged(user => {
                     currentUser = user;
                     if (user) {
                         const path = `artifacts/${CONFIG.APP_ID}/public/data/stories`;
-                        // Instruction: Error callback required for snapshot listener
                         db.collection(path).onSnapshot(snap => {
                             const stories = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                             stories.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                             renderStoriesUI(stories);
                         }, err => {
-                            console.error("Firestore Listen Error:", err);
-                            const container = document.getElementById('dynamic-stories');
-                            container.innerHTML = '<span class="text-[10px] text-red-300 font-bold py-6 uppercase italic">Ошибка доступа к облаку</span>';
+                            console.error("Firestore error:", err);
                         });
                     }
                 });
-            } catch (e) { 
-                console.error("System Init Error:", e); 
-            }
+            } catch (e) { console.error("System Init Error:", e); }
         };
 
         function renderStoriesUI(stories) {
             const container = document.getElementById('dynamic-stories');
             if (stories.length === 0) {
-                container.innerHTML = '<span class="text-[10px] text-gray-300 font-bold py-6 uppercase tracking-widest italic">Нет новых историй</span>';
+                container.innerHTML = '<span class="text-[10px] text-gray-300 font-bold py-6 uppercase tracking-widest italic">Нет историй</span>';
                 return;
             }
             container.innerHTML = stories.map(s => `
@@ -340,7 +342,7 @@
         }
 
         function resizeImage(file) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = (e) => {
@@ -356,23 +358,29 @@
                         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                         resolve(canvas.toDataURL('image/jpeg', 0.6));
                     };
+                    img.onerror = reject;
                 };
+                reader.onerror = reject;
             });
         }
 
         window.handleFileUpload = async (input) => {
             const file = input.files[0];
-            if (!file || !currentUser || !isAuthor) return;
+            if (!file || !isAuthor) return;
             
-            const status = document.getElementById('upload-status');
-            status.classList.remove('hidden');
+            const statusBox = document.getElementById('upload-status');
+            const statusLabel = document.getElementById('status-label');
+            statusBox.classList.remove('hidden');
 
             try {
-                // Rule 3 Guard: Auth Before Queries
-                if (!auth.currentUser) {
-                   await auth.signInAnonymously();
+                // 1. Auth Guard (Rule 3)
+                if (!auth || !auth.currentUser) {
+                    statusLabel.innerText = "Авторизация...";
+                    await auth.signInAnonymously();
                 }
 
+                // 2. Process
+                statusLabel.innerText = "Сжатие фото...";
                 let uploadData;
                 if (file.type.startsWith('image')) {
                     uploadData = await resizeImage(file);
@@ -380,6 +388,8 @@
                     uploadData = file;
                 }
 
+                // 3. Cloudinary Upload
+                statusLabel.innerText = "Облако Cloudinary...";
                 const formData = new FormData();
                 formData.append('file', uploadData);
                 formData.append('upload_preset', CONFIG.CLOUDINARY_PRESET);
@@ -389,11 +399,15 @@
                     body: formData
                 });
 
-                if (!response.ok) throw new Error('Cloudinary upload failed');
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error?.message || 'Cloudinary Error');
+                }
                 const data = await response.json();
                 const secureUrl = data.secure_url;
 
-                // Rule 1: Strict Paths
+                // 4. Save to Firebase (Rule 1)
+                statusLabel.innerText = "Синхронизация...";
                 const path = `artifacts/${CONFIG.APP_ID}/public/data/stories`;
                 await db.collection(path).add({
                     url: secureUrl,
@@ -401,12 +415,13 @@
                     timestamp: Date.now()
                 });
 
-                status.classList.add('hidden');
+                statusBox.classList.add('hidden');
                 window.toggleAdminPanel();
+                input.value = '';
             } catch (e) {
-                console.error("Upload Error:", e);
-                status.classList.add('hidden');
-                alert("Ошибка сохранения. Попробуйте еще раз или проверьте Cloudinary.");
+                console.error("Full Upload Error Log:", e);
+                statusBox.classList.add('hidden');
+                alert("Ошибка: " + e.message + "\nПроверьте, что в Cloudinary пресет '" + CONFIG.CLOUDINARY_PRESET + "' имеет статус 'Unsigned'.");
             }
         };
 
@@ -447,12 +462,10 @@
         };
 
         window.scrollDeals = (dir) => document.getElementById('dealsGrid').scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
-        
         window.viewStory = (url, type) => {
             document.getElementById('story-viewer').style.display = 'flex';
             document.getElementById('story-content').innerHTML = type === 'video' ? `<video src="${url}" autoplay playsinline controls class="h-full"></video>` : `<img src="${url}" class="h-full object-contain">`;
         };
-        
         window.closeStory = () => { document.getElementById('story-viewer').style.display = 'none'; document.getElementById('story-content').innerHTML = ''; };
 
         window.toggleTripType = (type) => {
