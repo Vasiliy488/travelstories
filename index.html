@@ -400,6 +400,7 @@
             </div>
         </section>
 
+
         <!-- Слайдер Лучших Предложений (8 штук) -->
         <section id="hot-deals" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 fade-up">
             <div class="flex items-center justify-between mb-10">
@@ -671,7 +672,7 @@
 
             // --- CLOUDINARY INTEGRATION ---
             const CLOUDINARY_CLOUD_NAME = 'dic9tuiid';
-            const CLOUDINARY_PRESET = 'ml_default'; // Default unsigned preset
+            const CLOUDINARY_PRESET = 'voyogestories2'; // User provided preset
 
             const uploadToCloudinary = async (file) => {
                 const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
@@ -704,10 +705,10 @@
                     console.error("Cloudinary Exception:", error);
                     // Specific hints
                     if (error.message.includes('unsigned')) {
-                        throw new Error("Cloudinary: Пресет 'ml_default' должен быть 'Unsigned'. Проверьте настройки Cloudinary.");
+                        throw new Error("Cloudinary: Пресет 'voyogestories2' должен быть 'Unsigned'. Проверьте настройки Cloudinary.");
                     }
                     if (error.message.includes('preset')) {
-                        throw new Error(`Cloudinary: Пресет '${CLOUDINARY_PRESET}' не найден. Создайте его в настройках Upload.`);
+                        throw new Error(`Cloudinary: Пресет '${CLOUDINARY_PRESET}' не найден.`);
                     }
                     throw error;
                 }
