@@ -678,7 +678,9 @@
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', CLOUDINARY_PRESET);
-                // formData.append('folder', 'stories'); // Optional: folder name
+
+                console.log(`Cloudinary Upload to: ${url}`);
+                console.log(`Preset: ${CLOUDINARY_PRESET}`);
 
                 try {
                     const response = await fetch(url, {
@@ -687,17 +689,25 @@
                     });
 
                     if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.error?.message || 'Upload failed');
+                        const errorBody = await response.text(); // Get raw text first
+                        console.error('Cloudinary Raw Error:', errorBody);
+                        let errorJson;
+                        try { errorJson = JSON.parse(errorBody); } catch (e) { }
+
+                        throw new Error(`Upload Failed (${response.status}): ${errorJson?.error?.message || errorBody}`);
                     }
 
                     const data = await response.json();
-                    return data.secure_url; // Return the HTTPS URL of the uploaded image
+                    console.log('Cloudinary Response:', data);
+                    return data.secure_url;
                 } catch (error) {
-                    console.error("Cloudinary Error:", error);
-                    // Helpful error message for common issue
-                    if (error.message.includes('preset') || error.message.includes('unsigned')) {
-                        throw new Error("Не настроен 'Unsigned Upload Preset'. Проверьте настройки Cloudinary -> Upload -> Presets.");
+                    console.error("Cloudinary Exception:", error);
+                    // Specific hints
+                    if (error.message.includes('unsigned')) {
+                        throw new Error("Cloudinary: Пресет 'ml_default' должен быть 'Unsigned'. Проверьте настройки Cloudinary.");
+                    }
+                    if (error.message.includes('preset')) {
+                        throw new Error(`Cloudinary: Пресет '${CLOUDINARY_PRESET}' не найден. Создайте его в настройках Upload.`);
                     }
                     throw error;
                 }
