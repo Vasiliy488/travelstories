@@ -50,6 +50,8 @@
         .deal-card { transition: all 0.3s ease; flex: 0 0 280px; }
         @media (min-width: 640px) { .deal-card { flex: 0 0 320px; } }
         .deal-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06); }
+        .fade-up { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
         .hero-gradient { background: linear-gradient(135deg, rgba(21, 77, 222, 0.6) 0%, rgba(25, 57, 142, 0.4) 50%, rgba(0, 0, 0, 0.3) 100%); }
         .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
@@ -79,14 +81,14 @@
             <div class="bg-brand-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-600">
                 <i data-lucide="lock" class="w-8 h-8"></i>
             </div>
-            <h3 class="text-xl font-black mb-2 text-gray-900 font-heading text-center">Вход для автора</h3>
-            <p class="text-sm text-gray-400 mb-6 font-medium text-center">Введите секретный код</p>
+            <h3 class="text-xl font-black mb-2 text-gray-900 font-heading">Вход для автора</h3>
+            <p class="text-sm text-gray-400 mb-6 font-medium">Введите секретный код</p>
             <input type="password" id="admin-password" placeholder="••••" class="w-full text-center text-2xl tracking-[0.5em] py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-brand-300 outline-none mb-4 font-bold text-gray-900">
             <div class="flex gap-2">
                 <button onclick="closeAuth()" class="flex-1 py-4 text-gray-400 font-bold hover:text-gray-600 transition">Отмена</button>
-                <button onclick="checkPassword()" class="flex-1 py-4 bg-brand-600 text-white rounded-2xl font-black shadow-lg shadow-brand-200 active:scale-95 transition-transform">ВОЙТИ</button>
+                <button onclick="checkPassword()" class="flex-1 py-4 bg-brand-600 text-white rounded-2xl font-black shadow-lg">ВОЙТИ</button>
             </div>
-            <p id="auth-error" class="text-red-500 text-xs mt-4 font-bold hidden text-center">Неверный код доступа</p>
+            <p id="auth-error" class="text-red-500 text-xs mt-4 font-bold hidden">Неверный код доступа</p>
         </div>
     </div>
 
@@ -113,22 +115,22 @@
                         <div class="w-16 h-16 rounded-full border-2 border-dashed border-brand-300 flex items-center justify-center bg-brand-50">
                             <i data-lucide="plus" class="w-6 h-6 text-brand-500"></i>
                         </div>
-                        <span class="text-[10px] font-bold text-brand-500 uppercase tracking-tighter text-center">Добавить</span>
+                        <span class="text-[10px] font-bold text-brand-500 uppercase tracking-tighter">Добавить</span>
                     </div>
                     <div id="dynamic-stories" class="flex gap-5">
-                        <!-- Динамический контент -->
+                        <div class="shimmer w-16 h-16 rounded-full flex-shrink-0"></div>
+                        <div class="shimmer w-16 h-16 rounded-full flex-shrink-0"></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Search Section -->
+        <!-- Flight Search -->
         <section class="relative min-h-[460px] lg:min-h-[520px] flex items-center justify-center text-center px-4 overflow-hidden">
             <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2000" class="absolute inset-0 w-full h-full object-cover" alt="фон">
             <div class="absolute inset-0 hero-gradient"></div>
             <div class="relative z-10 w-full max-w-4xl">
                 <h1 class="text-3xl md:text-5xl lg:text-6xl font-black font-heading text-white mb-6 leading-tight uppercase tracking-tight">Ваше приключение начинается здесь</h1>
-                
                 <div id="searchFormContainer" class="bg-white p-4 sm:p-6 rounded-[2.5rem] shadow-2xl">
                     <div class="flex items-center gap-2 mb-4">
                         <button id="btnRoundTrip" onclick="toggleTripType('roundtrip')" class="trip-toggle active px-6 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest">Туда-обратно</button>
@@ -152,40 +154,38 @@
                         <button onclick="searchFlights()" class="bg-brand-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-brand-700 transition shadow-lg active:scale-95">НАЙТИ</button>
                     </div>
                     <div class="mt-4 flex flex-col md:flex-row gap-3">
-                        <input id="inputDateDepart" type="date" class="flex-1 px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100 font-bold text-sm text-gray-900">
-                        <input id="inputDateReturn" type="date" class="flex-1 px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100 font-bold text-sm text-gray-900 date-field">
+                        <input id="inputDateDepart" type="date" class="flex-1 px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100 font-bold text-sm text-gray-900 outline-none">
+                        <input id="inputDateReturn" type="date" class="flex-1 px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100 font-bold text-sm text-gray-900 date-field outline-none">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Hot Deals Slider -->
+        <!-- Deals -->
         <section id="hot-deals" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-gray-900">
-            <div class="flex items-center justify-between mb-10 text-gray-900">
+            <div class="flex items-center justify-between mb-10">
                 <h2 class="text-2xl lg:text-3xl font-black flex items-center gap-3">
                     <div class="bg-green-100 p-2.5 rounded-2xl shrink-0"><i data-lucide="trending-down" class="text-green-600 w-7 h-7"></i></div>
                     Лучшие предложения
                 </h2>
                 <div class="flex gap-2">
-                    <button onclick="scrollDeals('left')" class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:bg-brand-50 transition active:scale-90"><i data-lucide="chevron-left"></i></button>
-                    <button onclick="scrollDeals('right')" class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:bg-brand-50 transition active:scale-90"><i data-lucide="chevron-right"></i></button>
+                    <button onclick="scrollDeals('left')" class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm"><i data-lucide="chevron-left"></i></button>
+                    <button onclick="scrollDeals('right')" class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm"><i data-lucide="chevron-right"></i></button>
                 </div>
             </div>
-            <div id="dealsGrid" class="scroll-container flex overflow-x-auto no-scrollbar gap-6 pb-8 px-2">
-                <!-- Карточки 8 штук -->
-            </div>
+            <div id="dealsGrid" class="scroll-container flex overflow-x-auto no-scrollbar gap-6 pb-8"></div>
         </section>
 
-        <!-- Путеводители (6 ШТУК) -->
+        <!-- Guides -->
         <section id="guides" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-gray-900">
-            <h2 class="text-2xl lg:text-3xl font-bold font-heading flex items-center gap-3 mb-10">
+            <h2 class="text-2xl lg:text-3xl font-black flex items-center gap-3 mb-10">
                 <div class="bg-brand-100 p-2.5 rounded-2xl"><i data-lucide="book-open" class="text-brand-600 w-7 h-7"></i></div>
                 Путеводители и советы
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <article onclick="openArticle('istanbul')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Стамбул"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-brand-600 uppercase">Маршрут</div></div>
-                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight">Стамбул за 3 дня</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">План идеального путешествия в город контрастов.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>12 мая</span><span class="text-brand-600">Читать →</span></div></div>
+                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight">Стамбул за 3 дня</h3><p class="text-sm text-gray-500 line-clamp-2">План идеального путешествия в город контрастов.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>12 мая</span><span class="text-brand-600">Читать →</span></div></div>
                 </article>
                 <article onclick="openArticle('layovers')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer">
                     <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Аэропорт"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-green-600 uppercase">Экономия</div></div>
@@ -210,31 +210,22 @@
             </div>
         </section>
 
-        <!-- SEO Текст -->
+        <!-- SEO -->
         <section class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 bg-white border border-gray-100 rounded-[3rem] mb-20 text-gray-900">
             <h2 class="text-2xl font-black mb-8 uppercase tracking-tight text-left font-heading">VoyogeStories — ваш гид в мире выгодных авиаперелетов</h2>
-            <div class="grid md:grid-cols-2 gap-10 text-sm text-gray-600 leading-relaxed text-left font-medium">
-                <p>Мы предлагаем современный инструмент для поиска авиабилетов по всему миру. Наша система сканирует данные сотен авиакомпаний и лоукостеров в реальном времени, помогая вам купить дешевые билеты на самолет без наценок и скрытых комиссий.</p>
-                <p>Помимо поиска рейсов, на нашем сайте вы найдете авторские путеводители от опытных путешественников. VoyogeStories — это вдохновение для ваших новых открытий!</p>
+            <div class="grid md:grid-cols-2 gap-10 text-sm text-gray-600 font-medium">
+                <p>Мы предлагаем современный инструмент для поиска авиабилетов. Наша система сканирует данные сотен авиакомпаний в реальном времени, помогая вам купить дешевые билеты на самолет без наценок.</p>
+                <p>Помимо поиска рейсов, на нашем сайте вы найдете авторские путеводители от опытных путешественников. Открывайте мир вместе с нами!</p>
             </div>
         </section>
     </main>
 
-    <!-- Окно статьи -->
-    <div id="article-view" class="p-6">
-        <div class="max-w-4xl mx-auto text-gray-900 text-left">
-            <button onclick="showView('home')" class="mb-8 font-bold flex items-center gap-2 text-brand-600 hover:text-brand-700 transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i> Назад на главную</button>
-            <h1 id="article-title-view" class="text-3xl md:text-5xl font-black mb-10 leading-tight font-heading uppercase tracking-tighter"></h1>
-            <div id="article-content-view" class="prose prose-blue max-w-none text-gray-700"></div>
-        </div>
-    </div>
-
-    <!-- Режим автора -->
+    <!-- Admin Panel -->
     <div id="admin-panel">
         <div class="max-w-4xl mx-auto flex items-center justify-between text-gray-900">
-            <div><p class="font-black text-lg uppercase tracking-tight font-heading">Режим автора</p><p class="text-[10px] text-gray-400 font-bold uppercase">Загрузите контент (сжатие до 1Мб)</p></div>
+            <div><p class="font-black text-lg uppercase tracking-tight font-heading">Режим автора</p><p class="text-[10px] text-gray-400 font-bold uppercase">Добавьте контент в облако</p></div>
             <div class="flex items-center gap-3">
-                <label class="cursor-pointer bg-brand-600 text-white px-6 py-3 rounded-2xl font-black text-xs shadow-xl active:scale-95 flex items-center gap-2 transition-all">
+                <label class="cursor-pointer bg-brand-600 text-white px-6 py-3 rounded-2xl font-black text-xs shadow-xl active:scale-95 flex items-center gap-2">
                     <i data-lucide="upload-cloud" class="w-4 h-4"></i> ВЫБРАТЬ ФАЙЛ
                     <input type="file" id="hidden-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileUpload(this)">
                 </label>
@@ -243,11 +234,18 @@
         </div>
         <div id="upload-status" class="hidden mt-4 p-3 bg-brand-50 rounded-xl flex items-center justify-center gap-3 text-gray-900 font-bold">
             <div class="animate-spin text-brand-600"><i data-lucide="refresh-cw" class="w-4 h-4"></i></div>
-            <span class="text-xs uppercase italic">Синхронизация...</span>
+            <span id="status-label" class="text-xs uppercase italic">Синхронизация...</span>
         </div>
     </div>
 
-    <!-- Плеер историй -->
+    <!-- Modals -->
+    <div id="article-view" class="p-6">
+        <div class="max-w-4xl mx-auto text-gray-900 text-left">
+            <button onclick="showView('home')" class="mb-8 font-bold flex items-center gap-2 text-brand-600"><i data-lucide="arrow-left" class="w-4 h-4"></i> Назад</button>
+            <h1 id="article-title-view" class="text-3xl md:text-5xl font-black mb-10 leading-tight font-heading uppercase tracking-tighter"></h1>
+            <div id="article-content-view" class="prose prose-blue max-w-none text-gray-700"></div>
+        </div>
+    </div>
     <div id="story-viewer" onclick="closeStory()">
         <div id="story-content" class="w-full h-full flex items-center justify-center p-2 text-white"></div>
     </div>
@@ -257,37 +255,36 @@
     </footer>
 
     <script>
-        // --- DATA & ARTICLES ---
+        // --- CONFIG ---
         const CONFIG = {
             API_BASE: 'https://aviasales-proxy.brainholland64.workers.dev',
             TOKEN: '33455759bbacefe8bc09110cb398bbd9',
             MARKER: '703570',
-            APP_ID: typeof __app_id !== 'undefined' ? __app_id : 'voyogestories-v9'
+            APP_ID: typeof __app_id !== 'undefined' ? __app_id : 'voyogestories-v10'
         };
 
         const ARTICLES_DATA = {
-            istanbul: { title: "Стамбул за 3 дня", content: "<h2>Сердце Босфора</h2><p>Стамбул — это город, в котором Восток встречается с Западом. За три дня вы успеете посетить главные мечети, прокатиться на пароме по Босфору и попробовать легендарный стритфуд.</p>" },
-            layovers: { title: "Длинные пересадки", content: "<h2>Искусство пересадки</h2><p>Длинная стыковка — это возможность увидеть новую страну бесплатно. Пользуйтесь программами Stopover от крупных авиакомпаний и бронируйте бизнес-залы для комфортного отдыха.</p>" },
-            bali: { title: "Бали 2026", content: "<h2>Остров Богов</h2><p>Новые правила въезда, визы и налоги в 2026 году. Помните о международном водительском удостоверении и новых налогах для туристов.</p>" },
-            georgia: { title: "Грузия за неделю", content: "<h2>Душа Кавказа</h2><p>Грузия — это гостеприимство, вино и невероятные горы. Маршрут включает Тбилиси, Казбеги и Кахетию. Обязательно попробуйте хинкали в местных духанах.</p>" },
-            baggage: { title: "Ручная кладь 10 кг", content: "<h2>Легкость в пути</h2><p>Советы по сборам: как уместить всё необходимое в 10 кг и не платить за багаж лоукостерам. Используйте вакуумные пакеты и многослойность в одежде.</p>" },
-            maldives: { title: "Мальдивы за 100$", content: "<h2>Рай доступен</h2><p>Бюджетный отдых на локальных островах Мальдив (Маафуши, Тодду) по цене Турции. Лазурная вода и белый песок без переплат за резорты.</p>" }
+            istanbul: { title: "Стамбул за 3 дня", content: "<h2>Сердце Босфора</h2><p>Стамбул — это город контрастов.</p>" },
+            layovers: { title: "Длинные пересадки", content: "<h2>Искусство ожидания</h2><p>Как провести время в аэропорту бесплатно.</p>" },
+            bali: { title: "Бали 2026", content: "<h2>Остров Богов</h2><p>Новые правила въезда и лайфхаки.</p>" },
+            georgia: { title: "Грузия: Тбилиси и горы", content: "<h2>Душа Кавказа</h2><p>Тбилиси, Казбеги и Кахетия.</p>" },
+            baggage: { title: "Ручная кладь 10 кг", content: "<h2>Легкость в пути</h2><p>Советы по сборам в дорогу.</p>" },
+            maldives: { title: "Мальдивы за 100$", content: "<h2>Рай доступен</h2><p>Локальные острова (Маафуши, Тодду).</p>" }
         };
 
-        const CITY_NAMES = { 'MOW': 'Москва', 'LED': 'Санкт-Петербург', 'IST': 'Стамбул', 'DXB': 'Дубай', 'HKT': 'Пхукет', 'DPS': 'Бали', 'TBS': 'Тбилиси' };
+        const CITY_NAMES = { 'MOW': 'Москва', 'LED': 'Санкт-Петербург', 'IST': 'Стамбул', 'DXB': 'Дубай', 'HKT': 'Пхукет', 'DPS': 'Бали' };
 
-        // --- FIREBASE SYSTEM ---
+        // --- FIREBASE ---
         let db, auth, currentUser, isAuthor = false;
 
-        const initFirebaseSystem = async () => {
+        const initFirebase = async () => {
             try {
-                if (typeof __firebase_config === 'undefined' || !__firebase_config) return;
+                if (typeof __firebase_config === 'undefined') return;
                 const fbConfig = JSON.parse(__firebase_config);
                 firebase.initializeApp(fbConfig);
                 db = firebase.firestore();
                 auth = firebase.auth();
                 
-                // Rule 3: Auth First
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await auth.signInWithCustomToken(__initial_auth_token);
                 } else {
@@ -301,17 +298,17 @@
                         db.collection(path).onSnapshot(snap => {
                             const stories = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                             stories.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                            renderStoriesUI(stories);
-                        }, err => console.warn("Access error. Check security rules."));
+                            renderStories(stories);
+                        }, err => console.warn("Snapshot restriction."));
                     }
                 });
-            } catch (e) { console.warn("Firebase config missing or invalid."); }
+            } catch (e) { console.warn("Firebase limited."); }
         };
 
-        function renderStoriesUI(stories) {
+        function renderStories(stories) {
             const container = document.getElementById('dynamic-stories');
-            if (!stories.length) {
-                container.innerHTML = '<span class="text-[10px] text-gray-300 font-bold py-6 uppercase tracking-widest italic">Нет новых историй</span>';
+            if (stories.length === 0) {
+                container.innerHTML = '<span class="text-[10px] text-gray-300 font-bold py-6 uppercase tracking-widest italic">Нет историй</span>';
                 return;
             }
             container.innerHTML = stories.map(s => `
@@ -324,8 +321,8 @@
             `).join('');
         }
 
-        // --- IMAGE RESIZER ---
-        function resizeImage(file) {
+        // --- IMAGE RESIZER (Safe for Firestore) ---
+        function resizeAndCompress(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -335,12 +332,13 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         let w = img.width, h = img.height;
-                        const max = 1000;
+                        const max = 800; // Small size for Firestore
                         if (w > h && w > max) { h *= max/w; w = max; }
                         else if (h > max) { w *= max/h; h = max; }
                         canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', 0.6));
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', 0.5)); // High compression
                     };
                 };
             });
@@ -355,7 +353,7 @@
             try {
                 let finalData;
                 if (file.type.startsWith('image')) {
-                    finalData = await resizeImage(file);
+                    finalData = await resizeAndCompress(file);
                 } else {
                     if (file.size > 1024 * 1024) { alert("Видео слишком большое (макс 1Мб)"); status.classList.add('hidden'); return; }
                     finalData = await new Promise(res => {
@@ -371,7 +369,7 @@
                 window.toggleAdminPanel();
             } catch (e) {
                 status.classList.add('hidden');
-                alert("Ошибка сохранения. Попробуйте файл меньшего размера.");
+                alert("Ошибка сохранения.");
             }
         };
 
@@ -423,7 +421,6 @@
             document.querySelector('.date-field').style.opacity = type === 'oneway' ? '0.2' : '1';
         };
 
-        // --- API INTEGRATION ---
         const formatASDate = (d) => d ? d.split('-').reverse().join('').slice(0,4) : '';
 
         window.handleAutocompleteInput = (e, type) => {
@@ -459,9 +456,9 @@
                         const ds = formatASDate(deal.depart_date);
                         const rs = deal.return_date ? formatASDate(deal.return_date) : '';
                         return `
-                            <div class="deal-card bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col text-gray-900">
+                            <div class="deal-card bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col text-gray-900 text-left">
                                 <div class="flex justify-between mb-5"><div class="bg-brand-50 p-2.5 rounded-xl text-brand-600 shrink-0"><i data-lucide="plane"></i></div><span class="text-green-600 font-black text-xl">${deal.value.toLocaleString()} ₽</span></div>
-                                <h3 class="font-bold mb-1 leading-snug">${CITY_NAMES[deal.origin] || deal.origin} → ${CITY_NAMES[deal.destination] || deal.destination}</h3>
+                                <h3 class="font-bold mb-1 leading-snug">${deal.origin} → ${deal.destination}</h3>
                                 <p class="text-xs text-gray-400 mb-6 flex-1 font-bold uppercase">${new Date(deal.depart_date).toLocaleDateString('ru-RU', {month: 'long', day: 'numeric'})}</p>
                                 <a href="https://www.aviasales.ru/search/${deal.origin}${ds}${deal.destination}${rs}1?marker=${CONFIG.MARKER}" target="_blank" class="block py-3.5 bg-brand-50 text-brand-700 rounded-2xl text-center font-black text-xs hover:bg-brand-600 hover:text-white transition uppercase">Билеты</a>
                             </div>
@@ -470,7 +467,8 @@
                     lucide.createIcons();
                 });
 
-            initFirebaseSystem();
+            initFirebase();
+            document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
         };
     </script>
 </body>
