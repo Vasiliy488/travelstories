@@ -766,30 +766,35 @@
                 // Rule 3 Guard: Auth Before Queries
                 if (!auth.currentUser) await auth.signInAnonymously();
 
+                console.log("Starting upload to Cloudinary...");
                 const publicUrl = await uploadToCloudinary(file);
+                console.log("Upload success:", publicUrl);
 
-                // Check DB again
-                if (!db) {
+                const path = `artifacts/${CONFIG.APP_ID}/public/data/stories`;
+
+                // Ensure db is connected before adding
+                if (!db && firebaseConfigStr) {
                     const fbConfig = JSON.parse(firebaseConfigStr);
                     firebase.initializeApp(fbConfig);
                     db = firebase.firestore();
+                } else if (!db) {
+                    console.warn("Using offline Mock DB - Data will NOT sync to other devices.");
                 }
 
-                const path = `artifacts/${CONFIG.APP_ID}/public/data/stories`;
                 await db.collection(path).add({
                     url: publicUrl,
                     type: file.type.startsWith('video') ? 'video' : 'image',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp() // Use server timestamp
+                    timestamp: Date.now()
                 });
 
                 statusLabel.textContent = 'Успешно!';
                 setTimeout(() => {
                     status.classList.add('hidden');
                     window.toggleAdminPanel();
-                    alert("История опубликована!");
+                    alert("История опубликована! Проверьте Cloudinary Dashboard.");
                 }, 1000);
             } catch (e) {
-                console.error("Upload Error:", e);
+                console.error("Upload/Save Error:", e);
                 statusLabel.textContent = 'Ошибка';
                 alert("Ошибка: " + e.message);
                 status.classList.add('hidden');
