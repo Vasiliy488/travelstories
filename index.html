@@ -668,9 +668,43 @@
             }
         } catch (e) {
             console.warn("Firebase Init Skipped:", e);
-            // Mock objects to prevent crash
-            db = { collection: () => ({ onSnapshot: () => { }, add: () => { } }) };
-            auth = { signInAnonymously: () => { }, onAuthStateChanged: () => { }, signInWithCustomToken: () => { } };
+
+            // --- MOCK FUNCTIONALITY FOR DEMO ---
+            const localStories = []; // Store stories in memory for session
+            let snapshotCallback = null;
+
+            db = {
+                collection: (path) => ({
+                    onSnapshot: (cb) => {
+                        snapshotCallback = cb;
+                        const mockSnap = [];
+                        mockSnap.forEach = (fn) => localStories.forEach((s, idx) => fn({ id: 'mock_' + idx, data: () => s }));
+                        cb(mockSnap);
+                        return () => { }; // unsubscribe mock
+                    },
+                    add: async (data) => {
+                        console.log("Mock add story:", data);
+                        localStories.unshift(data); // Add to beginning
+                        // Update UI via snapshot callback
+                        if (snapshotCallback) {
+                            const mockSnap = [];
+                            mockSnap.forEach = (fn) => localStories.forEach((s, idx) => fn({ id: 'mock_' + idx, data: () => s }));
+                            snapshotCallback(mockSnap);
+                        }
+                        return { id: 'mock_id_' + Date.now() };
+                    }
+                })
+            };
+
+            auth = {
+                signInAnonymously: async () => { },
+                onAuthStateChanged: (cb) => {
+                    // Simulate logged in user immediately for demo
+                    setTimeout(() => cb({ uid: 'mock_user_123' }), 500);
+                    return () => { };
+                },
+                signInWithCustomToken: async () => { }
+            };
         }
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'voyogestories-v2';
 
