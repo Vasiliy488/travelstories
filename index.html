@@ -696,143 +696,204 @@
                         try { errorJson = JSON.parse(errorBody); } catch (e) { }
 
                         throw new Error(`Upload Failed (${response.status}): ${errorJson?.error?.message || errorBody}`);
+                        // --- DEBUG TOOLS ---
+                        window.testCloudinaryConnection = async () => {
+                            const statusDiv = document.getElementById('cloudinary-status') || document.createElement('div');
+                            statusDiv.id = 'cloudinary-status';
+                            statusDiv.style.position = 'fixed';
+                            statusDiv.style.bottom = '20px';
+                            statusDiv.style.right = '20px';
+                            statusDiv.style.background = 'black';
+                            statusDiv.style.color = 'white';
+                            statusDiv.style.padding = '15px';
+                            statusDiv.style.zIndex = '9999';
+                            statusDiv.style.borderRadius = '8px';
+                            statusDiv.style.maxWidth = '400px';
+                            statusDiv.style.wordBreak = 'break-all';
+                            document.body.appendChild(statusDiv);
+
+                            statusDiv.innerHTML = 'Testing Cloudinary... <br>Cloud: ' + CLOUDINARY_CLOUD_NAME + '<br>Preset: ' + CLOUDINARY_PRESET;
+
+                            try {
+                                // Create a 1x1 transparent pixel blob
+                                const pixel = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+                                const blob = await (await fetch(`data:image/gif;base64,${pixel}`)).blob();
+
+                                const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
+                                const formData = new FormData();
+                                formData.append('file', blob);
+                                formData.append('upload_preset', CLOUDINARY_PRESET);
+
+                                console.log("Debug: Sending test request to", url);
+                                const res = await fetch(url, { method: 'POST', body: formData });
+
+                                if (res.ok) {
+                                    const data = await res.json();
+                                    statusDiv.style.background = 'green';
+                                    statusDiv.innerHTML += '<br><b>SUCCESS!</b> Connection working.<br>URL: ' + data.secure_url;
+                                    console.log("Test Success:", data);
+                                } else {
+                                    const txt = await res.text();
+                                    statusDiv.style.background = 'red';
+                                    statusDiv.innerHTML += '<br><b>FAILED!</b> (' + res.status + ')<br>' + txt;
+                                    console.error("Test Failed:", txt);
+                                }
+                            } catch (e) {
+                                statusDiv.style.background = 'red';
+                                statusDiv.innerHTML += '<br><b>ERROR!</b><br>' + e.message;
+                                console.error("Test Error:", e);
+                            }
+                        };
+
+                        document.body.insertAdjacentHTML('beforeend', `
+                <div id="admin-panel" class="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-white/30 hidden">
+                    <div class="bg-white/90 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-white/50 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-400 to-purple-500"></div>
+                        <h2 class="text-2xl font-black text-gray-800 mb-6 flex items-center gap-3">
+                            <i data-lucide="shield-check" class="text-brand-600"></i> Панель автора
+                        </h2>
+                        
+                        <div class="space-y-4">
+                            <label class="block group cursor-pointer admin-upload-btn">
+                                <span class="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-wider group-hover:text-brand-600 transition">Добавить историю</span>
+                                <div class="relative overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 group-hover:border-brand-400 transition bg-gray-50 aspect-video flex flex-col items-center justify-center text-gray-400 p-4">
+                                    <input type="file" accept="image/*,video/*" class="hidden" onchange="handleFileUpload(this)">
+                                    <i data-lucide="upload-cloud" class="w-10 h-10 mb-2 group-hover:scale-110 transition"></i>
+                                    <span class="text-xs font-semibold">Нажмите для выбора</span>
+                                </div>
+                            </label>
+                            
+                            <hr class="border-gray-100">
+                            <button onclick="window.testCloudinaryConnection()" class="w-full py-3 rounded-xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 text-xs uppercase tracking-wide">
+                                🛠 Проверить связь с Cloudinary
+                            </button>
+
+                            <button onclick="toggleAdminPanel()" class="w-full py-4 bg-gray-800 text-white rounded-2xl font-bold hover:bg-black transition shadow-lg shadow-gray-200 mt-2">
+                                Закрыть
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `);
+                        // Revert handleFileUpload to use uploadToCloudinary
+                        // Note: The rest of the mock DB logic remains the same
+
+                        const loadLocalStories = () => {
+                            try {
+                                return JSON.parse(localStorage.getItem('voyoge_stories')) || [];
+                            } catch (e) { return []; }
+                        };
+
+                        const saveLocalStories = (stories) => {
+                            try {
+                                const saved = stories.slice(0, 20); // Keep last 20
+                                localStorage.setItem('voyoge_stories', JSON.stringify(saved));
+                            } catch (e) { console.warn("Storage full:", e); }
+                        };
+
+                        const localStories = loadLocalStories(); // Load on init
+                        let snapshotCallback = null;
+
+                        db = {
+                            collection: (path) => ({
+                                onSnapshot: (cb) => {
+                                    snapshotCallback = cb;
+                                    const mockSnap = [];
+                                    const currentStories = loadLocalStories();
+                                    mockSnap.forEach = (fn) => currentStories.forEach((s, idx) => fn({ id: 'cld_' + idx, data: () => s }));
+                                    cb(mockSnap);
+                                    return () => { };
+                                },
+                                add: async (data) => {
+                                    console.log("Saving story metadata:", data);
+                                    const currentStories = loadLocalStories();
+                                    currentStories.unshift(data);
+                                    saveLocalStories(currentStories);
+
+                                    if (snapshotCallback) {
+                                        const mockSnap = [];
+                                        mockSnap.forEach = (fn) => currentStories.forEach((s, idx) => fn({ id: 'cld_' + idx, data: () => s }));
+                                        snapshotCallback(mockSnap);
+                                    }
+                                    return { id: 'cld_id_' + Date.now() };
+                                }
+                            })
+                        };
+
+                        auth = {
+                            signInAnonymously: async () => { },
+                            onAuthStateChanged: (cb) => {
+                                // Simulate logged in user immediately for demo
+                                setTimeout(() => cb({ uid: 'mock_user_123' }), 500);
+                                return () => { };
+                            },
+                            signInWithCustomToken: async () => { }
+                        };
+                    }
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'voyogestories-v2';
+
+                    const CONFIG = {
+                        API_BASE: 'https://aviasales-proxy.brainholland64.workers.dev',
+                        TOKEN: '33455759bbacefe8bc09110cb398bbd9',
+                        MARKER: '703570'
+                    };
+
+                    const CITY_NAMES = {
+                        'MOW': 'Москва', 'LED': 'Санкт-Петербург', 'KZN': 'Казань', 'IST': 'Стамбул',
+                        'DXB': 'Дубай', 'HKT': 'Пхукет', 'DPS': 'Бали', 'TBS': 'Тбилиси', 'SVX': 'Екатеринбург'
+                    };
+
+                    const ARTICLES_DATA = {
+                        istanbul: { title: "Стамбул за 3 дня", date: "12 мая 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=1200", content: `<h2>Сердце Босфора</h2><p>Стамбул — город контрастов.</p>` },
+                        layovers: { title: "Как летать с длинными пересадками", date: "28 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=1200", content: `<h2>Искусство пересадки</h2><p>Как провести время в аэропорту с пользой.</p>` },
+                        bali: { title: "Бали 2026", date: "05 мая 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=1200", content: `<h2>Остров Богов</h2><p>Новые правила въезда.</p>` },
+                        georgia: { title: "Грузия: Тбилиси и горы", date: "20 апреля 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=1200", content: `<h2>Душа Кавказа</h2><p>Грузинское гостеприимство.</p>` },
+                        baggage: { title: "Ручная кладь 10 кг", date: "15 апреля 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1553531384-397c80973a0b?auto=format&fit=crop&q=80&w=1200", content: `<h2>Легкость</h2><p>Как упаковать всё необходимое.</p>` },
+                        maldives: { title: "Мальдивы за 100$", date: "10 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=1200", content: `<h2>Рай доступен</h2><p>Бюджетный отдых на островах.</p>` }
+                    };
+
+                    const FALLBACK_DEALS = [
+                        { origin: 'MOW', destination: 'IST', price: 12500, depart_date: '2026-05-20', return_date: '2026-05-27', value: 12500 },
+                        { origin: 'LED', destination: 'HKT', price: 45200, depart_date: '2026-06-15', return_date: '2026-06-25', value: 45200 },
+                        { origin: 'MOW', destination: 'AER', price: 8900, depart_date: '2026-05-21', return_date: '', value: 8900 },
+                        { origin: 'KZN', destination: 'DXB', price: 31000, depart_date: '2026-06-05', return_date: '2026-06-12', value: 31000 },
+                        { origin: 'MOW', destination: 'TBS', price: 14800, depart_date: '2026-05-25', return_date: '2026-06-01', value: 14800 },
+                        { origin: 'SVX', destination: 'TIV', price: 27400, depart_date: '2026-07-10', return_date: '2026-07-20', value: 27400 }
+                    ];
+
+                    let selectedFrom = null, selectedTo = null, tripType = 'roundtrip', currentUser = null, isAuthor = false;
+
+                    // --- AUTH & STORIES ---
+                    async function initAuthAndStories() {
+                        try {
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await auth.signInWithCustomToken(__initial_auth_token);
+                            } else {
+                                await auth.signInAnonymously();
+                            }
+
+                            auth.onAuthStateChanged((user) => {
+                                currentUser = user;
+                                if (user) {
+                                    const path = `artifacts/${appId}/public/data/stories`;
+                                    db.collection(path).onSnapshot((snap) => {
+                                        const stories = [];
+                                        snap.forEach(doc => stories.push({ id: doc.id, ...doc.data() }));
+                                        stories.sort((a, b) => b.timestamp - a.timestamp);
+                                        renderStories(stories);
+                                    }, (err) => console.error("SNAPSHOT_ERROR:", err));
+                                }
+                            });
+                        } catch (e) { console.error("AUTH_FAILED:", e); }
                     }
 
-                    const data = await response.json();
-                    console.log('Cloudinary Response:', data);
-                    return data.secure_url;
-                } catch (error) {
-                    console.error("Cloudinary Exception:", error);
-                    // Specific hints
-                    if (error.message.includes('unsigned')) {
-                        throw new Error("Cloudinary: Пресет 'voyogestories2' должен быть 'Unsigned'. Проверьте настройки Cloudinary.");
-                    }
-                    if (error.message.includes('preset')) {
-                        throw new Error(`Cloudinary: Пресет '${CLOUDINARY_PRESET}' не найден.`);
-                    }
-                    throw error;
-                }
-            };
-
-            // Revert handleFileUpload to use uploadToCloudinary
-            // Note: The rest of the mock DB logic remains the same
-
-            const loadLocalStories = () => {
-                try {
-                    return JSON.parse(localStorage.getItem('voyoge_stories')) || [];
-                } catch (e) { return []; }
-            };
-
-            const saveLocalStories = (stories) => {
-                try {
-                    const saved = stories.slice(0, 20); // Keep last 20
-                    localStorage.setItem('voyoge_stories', JSON.stringify(saved));
-                } catch (e) { console.warn("Storage full:", e); }
-            };
-
-            const localStories = loadLocalStories(); // Load on init
-            let snapshotCallback = null;
-
-            db = {
-                collection: (path) => ({
-                    onSnapshot: (cb) => {
-                        snapshotCallback = cb;
-                        const mockSnap = [];
-                        const currentStories = loadLocalStories();
-                        mockSnap.forEach = (fn) => currentStories.forEach((s, idx) => fn({ id: 'cld_' + idx, data: () => s }));
-                        cb(mockSnap);
-                        return () => { };
-                    },
-                    add: async (data) => {
-                        console.log("Saving story metadata:", data);
-                        const currentStories = loadLocalStories();
-                        currentStories.unshift(data);
-                        saveLocalStories(currentStories);
-
-                        if (snapshotCallback) {
-                            const mockSnap = [];
-                            mockSnap.forEach = (fn) => currentStories.forEach((s, idx) => fn({ id: 'cld_' + idx, data: () => s }));
-                            snapshotCallback(mockSnap);
+                    function renderStories(stories) {
+                        const container = document.getElementById('dynamic-stories');
+                        if (stories.length === 0) {
+                            container.innerHTML = '<p class="text-[10px] text-gray-300 font-bold uppercase py-6">Нет историй</p>';
+                            return;
                         }
-                        return { id: 'cld_id_' + Date.now() };
-                    }
-                })
-            };
-
-            auth = {
-                signInAnonymously: async () => { },
-                onAuthStateChanged: (cb) => {
-                    // Simulate logged in user immediately for demo
-                    setTimeout(() => cb({ uid: 'mock_user_123' }), 500);
-                    return () => { };
-                },
-                signInWithCustomToken: async () => { }
-            };
-        }
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'voyogestories-v2';
-
-        const CONFIG = {
-            API_BASE: 'https://aviasales-proxy.brainholland64.workers.dev',
-            TOKEN: '33455759bbacefe8bc09110cb398bbd9',
-            MARKER: '703570'
-        };
-
-        const CITY_NAMES = {
-            'MOW': 'Москва', 'LED': 'Санкт-Петербург', 'KZN': 'Казань', 'IST': 'Стамбул',
-            'DXB': 'Дубай', 'HKT': 'Пхукет', 'DPS': 'Бали', 'TBS': 'Тбилиси', 'SVX': 'Екатеринбург'
-        };
-
-        const ARTICLES_DATA = {
-            istanbul: { title: "Стамбул за 3 дня", date: "12 мая 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=1200", content: `<h2>Сердце Босфора</h2><p>Стамбул — город контрастов.</p>` },
-            layovers: { title: "Как летать с длинными пересадками", date: "28 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=1200", content: `<h2>Искусство пересадки</h2><p>Как провести время в аэропорту с пользой.</p>` },
-            bali: { title: "Бали 2026", date: "05 мая 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=1200", content: `<h2>Остров Богов</h2><p>Новые правила въезда.</p>` },
-            georgia: { title: "Грузия: Тбилиси и горы", date: "20 апреля 2026", category: "Маршруты", hero: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=1200", content: `<h2>Душа Кавказа</h2><p>Грузинское гостеприимство.</p>` },
-            baggage: { title: "Ручная кладь 10 кг", date: "15 апреля 2026", category: "Лайфхак", hero: "https://images.unsplash.com/photo-1553531384-397c80973a0b?auto=format&fit=crop&q=80&w=1200", content: `<h2>Легкость</h2><p>Как упаковать всё необходимое.</p>` },
-            maldives: { title: "Мальдивы за 100$", date: "10 апреля 2026", category: "Экономия", hero: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=1200", content: `<h2>Рай доступен</h2><p>Бюджетный отдых на островах.</p>` }
-        };
-
-        const FALLBACK_DEALS = [
-            { origin: 'MOW', destination: 'IST', price: 12500, depart_date: '2026-05-20', return_date: '2026-05-27', value: 12500 },
-            { origin: 'LED', destination: 'HKT', price: 45200, depart_date: '2026-06-15', return_date: '2026-06-25', value: 45200 },
-            { origin: 'MOW', destination: 'AER', price: 8900, depart_date: '2026-05-21', return_date: '', value: 8900 },
-            { origin: 'KZN', destination: 'DXB', price: 31000, depart_date: '2026-06-05', return_date: '2026-06-12', value: 31000 },
-            { origin: 'MOW', destination: 'TBS', price: 14800, depart_date: '2026-05-25', return_date: '2026-06-01', value: 14800 },
-            { origin: 'SVX', destination: 'TIV', price: 27400, depart_date: '2026-07-10', return_date: '2026-07-20', value: 27400 }
-        ];
-
-        let selectedFrom = null, selectedTo = null, tripType = 'roundtrip', currentUser = null, isAuthor = false;
-
-        // --- AUTH & STORIES ---
-        async function initAuthAndStories() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await auth.signInWithCustomToken(__initial_auth_token);
-                } else {
-                    await auth.signInAnonymously();
-                }
-
-                auth.onAuthStateChanged((user) => {
-                    currentUser = user;
-                    if (user) {
-                        const path = `artifacts/${appId}/public/data/stories`;
-                        db.collection(path).onSnapshot((snap) => {
-                            const stories = [];
-                            snap.forEach(doc => stories.push({ id: doc.id, ...doc.data() }));
-                            stories.sort((a, b) => b.timestamp - a.timestamp);
-                            renderStories(stories);
-                        }, (err) => console.error("SNAPSHOT_ERROR:", err));
-                    }
-                });
-            } catch (e) { console.error("AUTH_FAILED:", e); }
-        }
-
-        function renderStories(stories) {
-            const container = document.getElementById('dynamic-stories');
-            if (stories.length === 0) {
-                container.innerHTML = '<p class="text-[10px] text-gray-300 font-bold uppercase py-6">Нет историй</p>';
-                return;
-            }
-            container.innerHTML = stories.map(s => `
+                        container.innerHTML = stories.map(s => `
                 <div class="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer group" onclick="viewStory('${s.url}', '${s.type}')">
                     <div class="story-ring w-16 h-16 rounded-full"><div class="w-full h-full rounded-full border-2 border-white overflow-hidden bg-gray-100">
                         ${s.type === 'video' ? `<video src="${s.url}" class="w-full h-full object-cover"></video>` : `<img src="${s.url}" class="w-full h-full object-cover">`}
@@ -840,128 +901,128 @@
                     <span class="text-[10px] font-bold text-gray-700">Live</span>
                 </div>
             `).join('');
-        }
+                    }
 
-        async function handleFileUpload(input) {
-            const file = input.files[0];
-            if (!file || !currentUser || !isAuthor) return;
+                    async function handleFileUpload(input) {
+                        const file = input.files[0];
+                        if (!file || !currentUser || !isAuthor) return;
 
-            // Show loading state
-            const btn = document.querySelector('.admin-upload-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="animate-spin" data-lucide="loader"></i> Загрузка в облако...';
-            lucide.createIcons();
+                        // Show loading state
+                        const btn = document.querySelector('.admin-upload-btn');
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '<i class="animate-spin" data-lucide="loader"></i> Загрузка в облако...';
+                        lucide.createIcons();
 
-            try {
-                // Upload to Cloudinary
-                const publicUrl = await uploadToCloudinary(file);
+                        try {
+                            // Upload to Cloudinary
+                            const publicUrl = await uploadToCloudinary(file);
 
-                // Add to DB (Mock with Cloudinary URL)
-                await db.collection(`artifacts/${appId}/public/data/stories`).add({
-                    url: publicUrl,
-                    type: file.type.startsWith('video') ? 'video' : 'image',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    viewed: false
-                });
+                            // Add to DB (Mock with Cloudinary URL)
+                            await db.collection(`artifacts/${appId}/public/data/stories`).add({
+                                url: publicUrl,
+                                type: file.type.startsWith('video') ? 'video' : 'image',
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                                viewed: false
+                            });
 
-                toggleAdminPanel();
-                alert("История успешно загружена в Cloudinary!");
-            } catch (err) {
-                console.error(err);
-                alert("Ошибка загрузки: " + err.message);
-            } finally {
-                btn.innerHTML = originalText;
-                lucide.createIcons();
-            }
-        }
+                            toggleAdminPanel();
+                            alert("История успешно загружена в Cloudinary!");
+                        } catch (err) {
+                            console.error(err);
+                            alert("Ошибка загрузки: " + err.message);
+                        } finally {
+                            btn.innerHTML = originalText;
+                            lucide.createIcons();
+                        }
+                    }
 
-        // --- АВТОРИЗАЦИЯ АВТОРА ---
-        function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
-        function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
+                    // --- АВТОРИЗАЦИЯ АВТОРА ---
+                    function openAuth() { document.getElementById('auth-modal').style.display = 'flex'; }
+                    function closeAuth() { document.getElementById('auth-modal').style.display = 'none'; }
 
-        function checkPassword() {
-            const pass = document.getElementById('admin-password').value;
-            if (pass === '1234') { // ПАРОЛЬ ПО УМОЛЧАНИЮ
-                isAuthor = true;
-                closeAuth();
-                document.getElementById('add-story-circle').classList.remove('hidden');
-                document.getElementById('admin-panel').style.display = 'block';
-                document.getElementById('stories-section').scrollIntoView({ behavior: 'smooth' });
-            } else {
-                const err = document.getElementById('auth-error');
-                err.classList.remove('hidden');
-                setTimeout(() => err.classList.add('hidden'), 2000);
-            }
-        }
+                    function checkPassword() {
+                        const pass = document.getElementById('admin-password').value;
+                        if (pass === '1234') { // ПАРОЛЬ ПО УМОЛЧАНИЮ
+                            isAuthor = true;
+                            closeAuth();
+                            document.getElementById('add-story-circle').classList.remove('hidden');
+                            document.getElementById('admin-panel').style.display = 'block';
+                            document.getElementById('stories-section').scrollIntoView({ behavior: 'smooth' });
+                        } else {
+                            const err = document.getElementById('auth-error');
+                            err.classList.remove('hidden');
+                            setTimeout(() => err.classList.add('hidden'), 2000);
+                        }
+                    }
 
-        function toggleAdminPanel() {
-            const p = document.getElementById('admin-panel');
-            p.style.display = p.style.display === 'block' ? 'none' : 'block';
-        }
+                    function toggleAdminPanel() {
+                        const p = document.getElementById('admin-panel');
+                        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+                    }
 
-        // --- UI ---
-        function showView(view) {
-            document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
-            document.getElementById('article-view').style.display = view === 'article' ? 'block' : 'none';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+                    // --- UI ---
+                    function showView(view) {
+                        document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
+                        document.getElementById('article-view').style.display = view === 'article' ? 'block' : 'none';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
 
-        function openArticle(id) {
-            const data = ARTICLES_DATA[id];
-            if (data) {
-                document.getElementById('article-title').innerText = data.title;
-                document.getElementById('article-date').innerText = data.date;
-                document.getElementById('article-category').innerText = data.category;
-                document.getElementById('article-hero-img').src = data.hero;
-                document.getElementById('article-content').innerHTML = data.content;
-                showView('article');
-                lucide.createIcons();
-            }
-        }
+                    function openArticle(id) {
+                        const data = ARTICLES_DATA[id];
+                        if (data) {
+                            document.getElementById('article-title').innerText = data.title;
+                            document.getElementById('article-date').innerText = data.date;
+                            document.getElementById('article-category').innerText = data.category;
+                            document.getElementById('article-hero-img').src = data.hero;
+                            document.getElementById('article-content').innerHTML = data.content;
+                            showView('article');
+                            lucide.createIcons();
+                        }
+                    }
 
-        function scrollDeals(dir) {
-            document.getElementById('dealsGrid').scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
-        }
+                    function scrollDeals(dir) {
+                        document.getElementById('dealsGrid').scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
+                    }
 
-        function viewStory(url, type) {
-            const viewer = document.getElementById('story-viewer');
-            viewer.style.display = 'flex';
-            document.getElementById('story-content').innerHTML = type === 'video' ? `<video src="${url}" autoplay playsinline controls class="h-full"></video>` : `<img src="${url}" class="h-full object-contain">`;
-        }
-        function closeStory() { document.getElementById('story-viewer').style.display = 'none'; }
+                    function viewStory(url, type) {
+                        const viewer = document.getElementById('story-viewer');
+                        viewer.style.display = 'flex';
+                        document.getElementById('story-content').innerHTML = type === 'video' ? `<video src="${url}" autoplay playsinline controls class="h-full"></video>` : `<img src="${url}" class="h-full object-contain">`;
+                    }
+                    function closeStory() { document.getElementById('story-viewer').style.display = 'none'; }
 
-        function toggleTripType(type) {
-            tripType = type;
-            document.getElementById('btnRoundTrip').classList.toggle('active', type === 'roundtrip');
-            document.getElementById('btnOneWay').classList.toggle('active', type === 'oneway');
-            const retEl = document.getElementById('returnDateField');
-            retEl.style.opacity = type === 'oneway' ? '0' : '1';
-        }
+                    function toggleTripType(type) {
+                        tripType = type;
+                        document.getElementById('btnRoundTrip').classList.toggle('active', type === 'roundtrip');
+                        document.getElementById('btnOneWay').classList.toggle('active', type === 'oneway');
+                        const retEl = document.getElementById('returnDateField');
+                        retEl.style.opacity = type === 'oneway' ? '0' : '1';
+                    }
 
-        // --- SEARCH & API ---
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const p = dateStr.split('-');
-            return p[2] + p[1];
-        }
+                    // --- SEARCH & API ---
+                    function formatDate(dateStr) {
+                        if (!dateStr) return '';
+                        const p = dateStr.split('-');
+                        return p[2] + p[1];
+                    }
 
-        async function loadHotDeals() {
-            try {
-                const res = await fetch(`${CONFIG.API_BASE}/v2/prices/latest?currency=rub&limit=8&token=${CONFIG.TOKEN}`);
-                const data = await res.json();
-                renderDeals(data.data || FALLBACK_DEALS);
-            } catch (err) {
-                console.warn('API Error, using fallback:', err);
-                renderDeals(FALLBACK_DEALS);
-            }
-        }
+                    async function loadHotDeals() {
+                        try {
+                            const res = await fetch(`${CONFIG.API_BASE}/v2/prices/latest?currency=rub&limit=8&token=${CONFIG.TOKEN}`);
+                            const data = await res.json();
+                            renderDeals(data.data || FALLBACK_DEALS);
+                        } catch (err) {
+                            console.warn('API Error, using fallback:', err);
+                            renderDeals(FALLBACK_DEALS);
+                        }
+                    }
 
-        function renderDeals(deals) {
-            document.getElementById('dealsGrid').innerHTML = deals.map(d => {
-                const dep = formatDate(d.depart_date);
-                const ret = d.return_date ? formatDate(d.return_date) : '';
-                const searchPath = `${d.origin}${dep}${d.destination}${ret}1`;
-                return `
+                    function renderDeals(deals) {
+                        document.getElementById('dealsGrid').innerHTML = deals.map(d => {
+                            const dep = formatDate(d.depart_date);
+                            const ret = d.return_date ? formatDate(d.return_date) : '';
+                            const searchPath = `${d.origin}${dep}${d.destination}${ret}1`;
+                            return `
                     <div class="deal-card bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col text-gray-900">
                         <div class="flex justify-between mb-5">
                             <div class="bg-brand-50 p-2.5 rounded-xl text-brand-600 shrink-0"><i data-lucide="plane"></i></div>
@@ -972,44 +1033,44 @@
                         <a href="https://www.aviasales.ru/search/${searchPath}?marker=${CONFIG.MARKER}" target="_blank" class="block py-3.5 bg-brand-50 text-brand-700 rounded-2xl text-center font-black text-xs hover:bg-brand-600 hover:text-white transition active:scale-95 uppercase tracking-widest">Билеты</a>
                     </div>
                 `;
-            }).join('');
-            lucide.createIcons();
-        }
+                        }).join('');
+                        lucide.createIcons();
+                    }
 
-        function handleAutocompleteInput(e, type) {
-            const term = e.target.value;
-            const list = document.getElementById(type === 'from' ? 'autocompleteFrom' : 'autocompleteTo');
-            clearTimeout(window.atTimer);
-            window.atTimer = setTimeout(async () => {
-                if (term.length < 2) { list.classList.add('hidden'); return; }
-                const response = await fetch(`https://autocomplete.travelpayouts.com/places2?locale=ru&types[]=city&term=${encodeURIComponent(term)}`);
-                const data = await response.json();
-                list.innerHTML = data.map(c => `<div class="autocomplete-item font-bold" onmousedown="document.getElementById('input${type === 'from' ? 'From' : 'To'}').value = '${c.name}'; this.parentElement.classList.add('hidden');"><span>${c.name}</span><span class="text-gray-300 text-xs">${c.code}</span></div>`).join('');
-                list.classList.remove('hidden');
-            }, 300);
-        }
+                    function handleAutocompleteInput(e, type) {
+                        const term = e.target.value;
+                        const list = document.getElementById(type === 'from' ? 'autocompleteFrom' : 'autocompleteTo');
+                        clearTimeout(window.atTimer);
+                        window.atTimer = setTimeout(async () => {
+                            if (term.length < 2) { list.classList.add('hidden'); return; }
+                            const response = await fetch(`https://autocomplete.travelpayouts.com/places2?locale=ru&types[]=city&term=${encodeURIComponent(term)}`);
+                            const data = await response.json();
+                            list.innerHTML = data.map(c => `<div class="autocomplete-item font-bold" onmousedown="document.getElementById('input${type === 'from' ? 'From' : 'To'}').value = '${c.name}'; this.parentElement.classList.add('hidden');"><span>${c.name}</span><span class="text-gray-300 text-xs">${c.code}</span></div>`).join('');
+                            list.classList.remove('hidden');
+                        }, 300);
+                    }
 
-        function searchFlights() {
-            const from = document.getElementById('inputFrom').value;
-            const to = document.getElementById('inputTo').value;
-            const d1 = formatDate(document.getElementById('inputDateDepart').value);
-            if (from && to) window.open(`https://www.aviasales.ru/search/${from}${d1}${to}1?marker=${CONFIG.MARKER}`, '_blank');
-        }
+                    function searchFlights() {
+                        const from = document.getElementById('inputFrom').value;
+                        const to = document.getElementById('inputTo').value;
+                        const d1 = formatDate(document.getElementById('inputDateDepart').value);
+                        if (from && to) window.open(`https://www.aviasales.ru/search/${from}${d1}${to}1?marker=${CONFIG.MARKER}`, '_blank');
+                    }
 
-        function openMobileMenu() { document.getElementById('mobileMenu').classList.remove('translate-x-full'); document.getElementById('mobileOverlay').classList.replace('opacity-0', 'opacity-100'); document.getElementById('mobileOverlay').classList.remove('pointer-events-none'); }
-        function closeMobileMenu() { document.getElementById('mobileMenu').classList.add('translate-x-full'); document.getElementById('mobileOverlay').classList.replace('opacity-100', 'opacity-0'); document.getElementById('mobileOverlay').classList.add('pointer-events-none'); }
+                    function openMobileMenu() { document.getElementById('mobileMenu').classList.remove('translate-x-full'); document.getElementById('mobileOverlay').classList.replace('opacity-0', 'opacity-100'); document.getElementById('mobileOverlay').classList.remove('pointer-events-none'); }
+                    function closeMobileMenu() { document.getElementById('mobileMenu').classList.add('translate-x-full'); document.getElementById('mobileOverlay').classList.replace('opacity-100', 'opacity-0'); document.getElementById('mobileOverlay').classList.add('pointer-events-none'); }
 
-        window.onload = () => {
-            lucide.createIcons();
-            const now = new Date();
-            document.getElementById('inputDateDepart').valueAsDate = now;
-            const weekLater = new Date(); weekLater.setDate(now.getDate() + 7);
-            document.getElementById('inputDateReturn').valueAsDate = weekLater;
-            loadHotDeals();
-            initAuthAndStories();
-            const obs = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('visible')), { threshold: 0.05 });
-            document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
-        };
+                    window.onload = () => {
+                        lucide.createIcons();
+                        const now = new Date();
+                        document.getElementById('inputDateDepart').valueAsDate = now;
+                        const weekLater = new Date(); weekLater.setDate(now.getDate() + 7);
+                        document.getElementById('inputDateReturn').valueAsDate = weekLater;
+                        loadHotDeals();
+                        initAuthAndStories();
+                        const obs = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('visible')), { threshold: 0.05 });
+                        document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+                    };
     </script>
 </body>
 
