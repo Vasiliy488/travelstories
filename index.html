@@ -605,8 +605,56 @@
         const initSystem = async () => {
             try {
                 if (!firebaseConfigStr) {
-                    console.warn("Firebase config not found. Running in offline mode.");
-                    renderStoriesUI([]);
+                    console.warn("Firebase config not found. Running in offline/mock mode.");
+
+                    // --- MOCK FIREBASE ---
+                    auth = {
+                        currentUser: null,
+                        signInAnonymously: async () => {
+                            auth.currentUser = { uid: 'mock_user' };
+                            return { user: auth.currentUser };
+                        },
+                        onAuthStateChanged: (cb) => {
+                            // Simulate delayed login
+                            setTimeout(() => {
+                                auth.currentUser = { uid: 'mock_user' };
+                                cb(auth.currentUser);
+                            }, 500);
+                            return () => { };
+                        },
+                        signInWithCustomToken: async () => { }
+                    };
+
+                    const loadLocalStories = () => {
+                        try { return JSON.parse(localStorage.getItem('voyoge_stories')) || []; } catch (e) { return []; }
+                    };
+
+                    db = {
+                        collection: (path) => ({
+                            onSnapshot: (cb, errCb) => {
+                                const currentStories = loadLocalStories();
+                                // Simulate snapshot
+                                const mockDocs = currentStories.map((s, i) => ({ id: 'mock_' + i, data: () => s }));
+                                cb({ docs: mockDocs });
+                                return () => { };
+                            },
+                            add: async (data) => {
+                                console.log("Mock DB Adding:", data);
+                                const currentStories = loadLocalStories();
+                                currentStories.unshift(data);
+                                localStorage.setItem('voyoge_stories', JSON.stringify(currentStories.slice(0, 20)));
+                                return { id: 'mock_' + Date.now() };
+                            }
+                        })
+                    };
+
+                    // Initial render for mock mode
+                    auth.onAuthStateChanged((user) => {
+                        if (user) {
+                            const stories = loadLocalStories();
+                            renderStoriesUI(stories);
+                        }
+                    });
                     return;
                 }
 
