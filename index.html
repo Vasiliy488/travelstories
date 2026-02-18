@@ -65,22 +65,29 @@
         .prose h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #111827; }
         .prose p { margin-bottom: 1.25rem; line-height: 1.7; color: #4b5563; }
         .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.25rem; color: #4b5563; }
+        
+        .delete-btn {
+            position: absolute; top: -5px; right: -5px; 
+            background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; 
+            display: flex; align-items: center; justify-content: center; 
+            border: 2px solid white; z-index: 30; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s; cursor: pointer;
+        }
+        .delete-btn:hover { transform: scale(1.1); background: #dc2626; }
+        .delete-btn:active { transform: scale(0.9); }
     </style>
 </head>
 
 <body class="antialiased text-gray-900">
 
-    <!-- Пароль / Токен -->
+    <!-- Auth Modal -->
     <div id="auth-modal" class="p-4" style="display:none;">
         <div class="bg-white p-8 rounded-[2.5rem] w-full max-w-sm text-center shadow-2xl">
             <h3 class="text-xl font-black mb-4">Вход для Василия</h3>
-            
             <p class="text-xs text-gray-500 mb-2 text-left">PIN-код (1234)</p>
             <input type="password" id="admin-pin" placeholder="••••" class="w-full text-center text-2xl py-3 bg-gray-50 rounded-xl mb-4 border focus:border-brand-500 outline-none text-gray-900">
-            
             <p class="text-xs text-gray-500 mb-2 text-left">GitHub Token (один раз)</p>
             <input type="password" id="github-token" placeholder="ghp_..." class="w-full text-xs py-3 px-3 bg-gray-50 rounded-xl mb-6 border focus:border-brand-500 outline-none text-gray-900">
-            
             <div class="flex gap-2">
                 <button onclick="window.closeAuth()" class="flex-1 py-3 text-gray-400 font-bold hover:text-gray-600 transition">Отмена</button>
                 <button onclick="window.checkAuth()" class="flex-1 py-3 bg-brand-600 text-white rounded-xl font-black shadow-lg hover:bg-brand-700 transition">ВОЙТИ</button>
@@ -123,34 +130,57 @@
         <section class="relative min-h-[460px] lg:min-h-[520px] flex items-center justify-center text-center px-4 overflow-hidden text-white">
             <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2000" class="absolute inset-0 w-full h-full object-cover" alt="фон">
             <div class="absolute inset-0 hero-gradient"></div>
-            <div class="relative z-10 w-full max-w-4xl text-left sm:text-center">
-                <h1 class="text-3xl md:text-5xl lg:text-6xl font-black font-heading mb-6 leading-tight uppercase tracking-tight text-balance">Ваше приключение начинается здесь</h1>
+            <div class="relative z-10 w-full max-w-5xl text-left sm:text-center">
+                <h1 class="text-3xl md:text-5xl lg:text-6xl font-black font-heading mb-8 leading-tight uppercase tracking-tight text-balance">Ваше приключение начинается здесь</h1>
                 
                 <div id="searchFormContainer" class="bg-white p-4 sm:p-6 rounded-[2.5rem] shadow-2xl text-gray-900">
-                    <div class="flex items-center gap-2 mb-4">
-                        <button id="btnRoundTrip" onclick="window.toggleTripType('roundtrip')" class="trip-toggle active px-6 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">Туда-обратно</button>
-                        <button id="btnOneWay" onclick="window.toggleTripType('oneway')" class="trip-toggle px-6 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">В одну сторону</button>
+                    <div class="flex items-center gap-2 mb-5">
+                        <button id="btnRoundTrip" onclick="window.toggleTripType('roundtrip')" class="trip-toggle active px-6 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all">Туда-обратно</button>
+                        <button id="btnOneWay" onclick="window.toggleTripType('oneway')" class="trip-toggle px-6 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all">В одну сторону</button>
                     </div>
-                    <div class="flex flex-col md:flex-row gap-3">
-                        <div class="relative flex-1 text-left">
-                            <div class="flex items-center gap-3 px-4 py-1.5 bg-gray-50 rounded-2xl border border-gray-100 text-gray-900 focus-within:border-brand-300">
-                                <i data-lucide="plane-takeoff" class="w-5 h-5 text-gray-400"></i>
-                                <input id="inputFrom" type="text" placeholder="Откуда" oninput="window.handleAutocompleteInput(event, 'from')" autocomplete="off" class="w-full py-3 bg-transparent outline-none text-sm font-bold">
+
+                    <!-- Сетка полей -->
+                    <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto] gap-3 items-center">
+                        
+                        <!-- Блок ОТКУДА -->
+                        <div class="flex flex-col sm:flex-row gap-2 bg-gray-50 rounded-2xl p-2 border border-gray-100 focus-within:border-brand-300 transition-colors w-full">
+                            <div class="relative flex-1">
+                                <div class="flex items-center px-3 h-full">
+                                    <i data-lucide="plane-takeoff" class="w-5 h-5 text-gray-400 mr-2"></i>
+                                    <input id="inputFrom" type="text" placeholder="Откуда" oninput="window.handleAutocompleteInput(event, 'from')" autocomplete="off" class="w-full bg-transparent outline-none text-sm font-bold py-2">
+                                </div>
+                                <div id="autocompleteFrom" class="autocomplete-list hidden text-left"></div>
                             </div>
-                            <div id="autocompleteFrom" class="autocomplete-list hidden text-left"></div>
-                        </div>
-                        <div class="relative flex-1 text-left">
-                            <div class="flex items-center gap-3 px-4 py-1.5 bg-gray-50 rounded-2xl border border-gray-100 text-gray-900 focus-within:border-brand-300">
-                                <i data-lucide="plane-landing" class="w-5 h-5 text-gray-400"></i>
-                                <input id="inputTo" type="text" placeholder="Куда" oninput="window.handleAutocompleteInput(event, 'to')" autocomplete="off" class="w-full py-3 bg-transparent outline-none text-sm font-bold">
+                            <div class="w-px bg-gray-200 hidden sm:block"></div>
+                            <div class="flex items-center px-3">
+                                <i data-lucide="calendar" class="w-4 h-4 text-gray-400 mr-2"></i>
+                                <input id="inputDateDepart" type="date" class="bg-transparent outline-none text-xs font-bold text-gray-600 w-[110px]">
                             </div>
-                            <div id="autocompleteTo" class="autocomplete-list hidden text-left"></div>
                         </div>
-                        <button onclick="window.searchFlights()" class="bg-brand-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-brand-700 transition shadow-lg active:scale-95">НАЙТИ</button>
-                    </div>
-                    <div class="mt-4 flex flex-col md:flex-row gap-3">
-                        <input id="inputDateDepart" type="date" class="flex-1 px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100 font-bold text-sm text-gray-900 outline-none">
-                        <input id="inputDateReturn" type="date" class="flex-1 px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100 font-bold text-sm text-gray-900 date-field outline-none">
+
+                        <!-- Разделитель (на десктопе) -->
+                        <div class="hidden md:block text-gray-300"><i data-lucide="arrow-right" class="w-5 h-5"></i></div>
+
+                        <!-- Блок КУДА -->
+                        <div class="flex flex-col sm:flex-row gap-2 bg-gray-50 rounded-2xl p-2 border border-gray-100 focus-within:border-brand-300 transition-colors w-full">
+                            <div class="relative flex-1">
+                                <div class="flex items-center px-3 h-full">
+                                    <i data-lucide="plane-landing" class="w-5 h-5 text-gray-400 mr-2"></i>
+                                    <input id="inputTo" type="text" placeholder="Куда" oninput="window.handleAutocompleteInput(event, 'to')" autocomplete="off" class="w-full bg-transparent outline-none text-sm font-bold">
+                                </div>
+                                <div id="autocompleteTo" class="autocomplete-list hidden text-left"></div>
+                            </div>
+                            <div class="w-px bg-gray-200 hidden sm:block"></div>
+                            <div class="flex items-center px-3" id="returnDateContainer">
+                                <i data-lucide="calendar-check" class="w-4 h-4 text-gray-400 mr-2"></i>
+                                <input id="inputDateReturn" type="date" class="bg-transparent outline-none text-xs font-bold text-gray-600 w-[110px]">
+                            </div>
+                        </div>
+
+                        <!-- Кнопка -->
+                        <button onclick="window.searchFlights()" class="bg-brand-600 text-white px-8 py-4 rounded-2xl font-black hover:bg-brand-700 transition shadow-lg active:scale-95 w-full md:w-auto h-full flex items-center justify-center">
+                            <i data-lucide="search" class="w-5 h-5 md:hidden mr-2"></i> НАЙТИ
+                        </button>
                     </div>
                 </div>
             </div>
@@ -168,9 +198,7 @@
                     <button onclick="window.scrollDeals('right')" class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:bg-brand-50 transition active:scale-90"><i data-lucide="chevron-right"></i></button>
                 </div>
             </div>
-            <div id="dealsGrid" class="scroll-container flex overflow-x-auto no-scrollbar gap-6 pb-8 px-2 text-left">
-                <!-- Карточки загрузятся скриптом -->
-            </div>
+            <div id="dealsGrid" class="scroll-container flex overflow-x-auto no-scrollbar gap-6 pb-8 px-2 text-left"></div>
         </section>
 
         <!-- Guides Section -->
@@ -186,7 +214,7 @@
                 </article>
                 <article onclick="window.openArticle('layovers')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
                     <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Аэропорт"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-green-600 uppercase">Экономия</div></div>
-                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance">Как летать с длинными пересадками</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">Бесплатные отели от авиакомпаний и лучшие лаунжи.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>28 апр</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
+                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance">Длинные пересадки</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">Бесплатные отели от авиакомпаний и лучшие лаунжи.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>28 апр</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
                 </article>
                 <article onclick="window.openArticle('bali')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
                     <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Бали"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-accent-600 uppercase">Лайфхак</div></div>
@@ -272,6 +300,8 @@
         const CITY_NAMES = { 'MOW': 'Москва', 'LED': 'Санкт-Петербург', 'IST': 'Стамбул', 'DXB': 'Дубай', 'HKT': 'Пхукет', 'DPS': 'Бали', 'TBS': 'Тбилиси' };
         
         let githubToken = localStorage.getItem('gh_token');
+        let selectedFromCode = '';
+        let selectedToCode = '';
 
         // --- ENCODING HELPERS (UTF-8 SAFE) ---
         function toBase64(str) {
@@ -280,6 +310,12 @@
 
         function fromBase64(str) {
             return new TextDecoder().decode(Uint8Array.from(atob(str), c => c.charCodeAt(0)));
+        }
+
+        function formatASDate(d) {
+            if (!d) return '';
+            const p = d.split('-');
+            return p[2] + p[1]; // ддмм
         }
 
         // --- FETCH WITH TIMEOUT ---
@@ -300,13 +336,9 @@
         // --- GITHUB API STORAGE ---
         async function loadGithubStories() {
             try {
-                // Прямой запрос к файлу (если токен есть - через API, если нет - через RAW с cache-buster)
-                let url;
-                if (githubToken) {
-                     url = `https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`;
-                } else {
-                     url = `https://raw.githubusercontent.com/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/main/stories.json?t=${Date.now()}`;
-                }
+                const url = githubToken 
+                    ? `https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`
+                    : `https://raw.githubusercontent.com/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/main/stories.json?t=${Date.now()}`;
                 
                 const headers = githubToken ? { 'Authorization': `Bearer ${githubToken}`, 'Accept': 'application/vnd.github.v3+json' } : {};
 
@@ -316,10 +348,8 @@
                     let stories = [];
                     if (githubToken) {
                         const data = await res.json();
-                        if (data.content) {
+                        if (data.content && data.content.trim().length > 0) {
                             try {
-                                // Декодируем base64 content от API
-                                // Очистка от переносов строк, которые GitHub добавляет в base64
                                 const cleanContent = data.content.replace(/\n/g, '');
                                 stories = JSON.parse(fromBase64(cleanContent));
                             } catch (e) {
@@ -338,7 +368,6 @@
                     }
                     renderStoriesUI(stories.sort((a,b) => b.timestamp - a.timestamp));
                 } else {
-                    console.log("Stories file not found or empty (404), starting fresh.");
                     renderStoriesUI([]);
                 }
             } catch (e) { 
@@ -385,7 +414,7 @@
                    throw new Error(`GitHub Upload: ${errData.message}`);
                 }
 
-                // 2. Обновление JSON
+                // 2. Обновление индекса историй (stories.json)
                 statusLabel.innerText = "Обновление базы...";
                 let stories = [];
                 let sha = null;
@@ -403,9 +432,7 @@
                             try {
                                 const cleanContent = getData.content.replace(/\n/g, '');
                                 stories = JSON.parse(fromBase64(cleanContent));
-                            } catch (e) {
-                                console.warn("Corrupt stories.json on read, resetting.");
-                            }
+                            } catch (e) { console.warn("Stories file corrupt, creating new."); }
                         }
                         sha = getData.sha;
                     }
@@ -453,6 +480,34 @@
                 document.getElementById('upload-status').classList.add('hidden');
             }
         }
+        
+        window.deleteStory = async (event, timestamp) => {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            if (!confirm("Удалить историю?")) return;
+            if (!githubToken) { alert("Нужен токен автора"); return; }
+            
+            try {
+                const getRes = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, {
+                    headers: { 'Authorization': `Bearer ${githubToken}`, 'Accept': 'application/vnd.github.v3+json' }
+                });
+                
+                if (!getRes.ok) throw new Error("Ошибка чтения базы");
+                const getData = await getRes.json();
+                let stories = JSON.parse(fromBase64(getData.content.replace(/\n/g, '')));
+                const newStories = stories.filter(s => s.timestamp !== timestamp);
+                const newContentBase64 = toBase64(JSON.stringify(newStories));
+                
+                const updateRes = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${githubToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `Delete story`, content: newContentBase64, sha: getData.sha, branch: 'main' })
+                });
+
+                if (!updateRes.ok) throw new Error("Ошибка удаления");
+                alert("Удалено!");
+                loadGithubStories();
+            } catch (e) { alert(e.message); }
+        };
 
         // --- UI HANDLERS ---
         window.openAuth = () => document.getElementById('auth-modal').style.display = 'flex';
@@ -461,19 +516,14 @@
         window.checkAuth = () => {
             const pin = document.getElementById('admin-pin').value;
             const token = document.getElementById('github-token').value;
-            
             if (pin === '1234') {
-                if (token) {
-                    localStorage.setItem('gh_token', token);
-                    githubToken = token;
-                }
+                if (token) { localStorage.setItem('gh_token', token); githubToken = token; }
                 window.closeAuth();
                 document.getElementById('add-story-circle').classList.remove('hidden');
                 document.getElementById('admin-panel').style.display = 'block';
                 document.getElementById('stories-section').scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert("Неверный PIN");
-            }
+                loadGithubStories();
+            } else { alert("Неверный PIN"); }
         };
 
         window.handleFileUpload = (input) => {
@@ -488,7 +538,6 @@
             p.style.display = p.style.display === 'block' ? 'none' : 'block';
         };
 
-        // ... (Остальные функции UI: showView, openArticle, scrollDeals, viewStory, closeStory, toggleTripType) ...
         window.showView = (view) => {
             document.getElementById('home-view').style.display = view === 'home' ? 'block' : 'none';
             document.getElementById('article-view').style.display = view === 'article' ? 'block' : 'none';
@@ -512,58 +561,106 @@
         window.toggleTripType = (type) => {
              document.getElementById('btnRoundTrip').classList.toggle('active', type === 'roundtrip');
              document.getElementById('btnOneWay').classList.toggle('active', type === 'oneway');
-             document.getElementById('returnDateField').style.opacity = type === 'oneway' ? '0.2' : '1';
+             document.getElementById('returnDateContainer').style.display = type === 'oneway' ? 'none' : 'flex';
         };
-
-        const formatASDate = (d) => d ? d.split('-').reverse().join('').slice(0,4) : '';
+        
+        // --- SEARCH LOGIC (FIXED) ---
         window.handleAutocompleteInput = (e, type) => {
             const term = e.target.value;
             const list = document.getElementById(type === 'from' ? 'autocompleteFrom' : 'autocompleteTo');
             setTimeout(async () => {
                 if(term.length < 2) { list.classList.add('hidden'); return; }
-                const r = await fetch(`https://autocomplete.travelpayouts.com/places2?locale=ru&types[]=city&term=${encodeURIComponent(term)}`);
-                const data = await r.json();
-                list.innerHTML = data.map(c => `<div class="autocomplete-item font-bold" onmousedown="document.getElementById('input${type === 'from' ? 'From' : 'To'}').value = '${c.name}'; this.parentElement.classList.add('hidden');"><span>${c.name}</span><span class="text-gray-300 text-xs">${c.code}</span></div>`).join('');
-                list.classList.remove('hidden');
+                try {
+                    const r = await fetch(`https://autocomplete.travelpayouts.com/places2?locale=ru&types[]=city&term=${encodeURIComponent(term)}`);
+                    const data = await r.json();
+                    list.innerHTML = data.map(c => `<div class="autocomplete-item" onmousedown="window.selectCity('${type}', '${c.name}', '${c.code}')"><span>${c.name}</span><span class="text-gray-400 text-xs">${c.code}</span></div>`).join('');
+                    list.classList.remove('hidden');
+                } catch(e) {}
             }, 300);
         };
-        window.searchFlights = () => {
-            const f = document.getElementById('inputFrom').value;
-            const t = document.getElementById('inputTo').value;
-            const d = formatASDate(document.getElementById('inputDateDepart').value);
-            if (f && t) window.open(`https://www.aviasales.ru/search/${f}${d}${t}1?marker=${CONFIG.MARKER}`, '_blank');
+        
+        window.selectCity = (type, name, code) => {
+            if (type === 'from') {
+                document.getElementById('inputFrom').value = name;
+                selectedFromCode = code;
+                document.getElementById('autocompleteFrom').classList.add('hidden');
+            } else {
+                document.getElementById('inputTo').value = name;
+                selectedToCode = code;
+                document.getElementById('autocompleteTo').classList.add('hidden');
+            }
         };
+
+        window.searchFlights = () => {
+            const d1 = formatASDate(document.getElementById('inputDateDepart').value);
+            const d2 = formatASDate(document.getElementById('inputDateReturn').value);
+            // Если коды не выбраны (пользователь ввел вручную), пробуем искать по имени или просто не пускаем (лучше полагаться на выбор)
+            if (selectedFromCode && selectedToCode) {
+                 window.open(`https://www.aviasales.ru/search/${selectedFromCode}${d1}${selectedToCode}${d2}1?marker=${CONFIG.MARKER}`, '_blank');
+            } else {
+                alert("Пожалуйста, выберите город из выпадающего списка");
+            }
+        };
+        
         function renderStoriesUI(stories) { 
             const container = document.getElementById('dynamic-stories');
             if (stories.length === 0) {
                 container.innerHTML = '<span class="text-[10px] text-gray-300 font-bold py-6 uppercase tracking-widest italic">Нет историй</span>';
                 return;
             }
+            const isAuthorMode = !document.getElementById('add-story-circle').classList.contains('hidden');
             container.innerHTML = stories.map(s => `
-                <div class="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer group" onclick="event.stopPropagation(); viewStory('${s.url}', '${s.type}')">
-                    <div class="story-ring w-16 h-16 rounded-full"><div class="w-full h-full rounded-full border-2 border-white overflow-hidden bg-gray-100">
-                        ${s.type === 'video' ? `<video src="${s.url}" class="w-full h-full object-cover"></video>` : `<img src="${s.url}" class="w-full h-full object-cover">`}
-                    </div></div>
+                <div class="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer group relative">
+                    <div class="story-ring w-16 h-16 rounded-full" onclick="window.viewStory('${s.url}', '${s.type}')">
+                        <div class="w-full h-full rounded-full border-2 border-white overflow-hidden bg-gray-100">
+                            ${s.type === 'video' ? `<video src="${s.url}" class="w-full h-full object-cover"></video>` : `<img src="${s.url}" class="w-full h-full object-cover">`}
+                        </div>
+                    </div>
+                    ${isAuthorMode ? `<button class="delete-btn" onclick="window.deleteStory(event, ${s.timestamp})"><i data-lucide="x" class="w-3 h-3"></i></button>` : ''}
                     <span class="text-[10px] font-bold text-gray-700">Автор</span>
                 </div>
             `).join('');
+            lucide.createIcons();
         }
 
         window.onload = () => {
             lucide.createIcons();
             loadGithubStories();
-            // ... Load Deals ...
-            const now = new Date();
-            document.getElementById('inputDateDepart').valueAsDate = now;
-            const weekLater = new Date(); weekLater.setDate(now.getDate() + 7);
-            document.getElementById('inputDateReturn').valueAsDate = weekLater;
+            
+            // --- НАСТРОЙКА КАЛЕНДАРЯ (БЛОКИРОВКА ПРОШЛОГО) ---
+            const dateDepart = document.getElementById('inputDateDepart');
+            const dateReturn = document.getElementById('inputDateReturn');
+            
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0]; // Формат YYYY-MM-DD
+            
+            // 1. Блокируем прошедшие даты
+            dateDepart.min = todayStr;
+            dateReturn.min = todayStr;
+            
+            // 2. Устанавливаем начальные значения
+            dateDepart.value = todayStr;
+            
+            const weekLater = new Date(); 
+            weekLater.setDate(today.getDate() + 7);
+            dateReturn.value = weekLater.toISOString().split('T')[0];
+
+            // 3. Логика: дата возврата не может быть раньше даты вылета
+            dateDepart.addEventListener('change', function() {
+                dateReturn.min = this.value;
+                // Если выбранная дата возврата стала меньше новой даты вылета, сдвигаем её
+                if (dateReturn.value < this.value) {
+                    dateReturn.value = this.value;
+                }
+            });
+            // ---------------------------------------------------
             
             fetch(`${CONFIG.API_BASE}/v2/prices/latest?currency=rub&limit=8&token=${CONFIG.TOKEN}`)
                 .then(r => r.json())
                 .then(d => {
                     if (d.data) document.getElementById('dealsGrid').innerHTML = d.data.map(deal => {
                          const ds = formatASDate(deal.depart_date);
-                        const rs = deal.return_date ? formatASDate(deal.return_date) : '';
+                         const rs = deal.return_date ? formatASDate(deal.return_date) : '';
                         return `
                             <div class="deal-card bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col text-gray-900 text-left">
                                 <div class="flex justify-between mb-5"><div class="bg-brand-50 p-2.5 rounded-xl text-brand-600 shrink-0"><i data-lucide="plane"></i></div><span class="text-green-600 font-black text-xl">${deal.value.toLocaleString()} ₽</span></div>
