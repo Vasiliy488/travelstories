@@ -67,8 +67,8 @@
         .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.25rem; color: #4b5563; }
         
         .delete-btn {
-            position: absolute; top: -5px; right: -5px; 
-            background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; 
+            position: absolute; top: 12px; right: 12px; 
+            background: #ef4444; color: white; border-radius: 50%; width: 26px; height: 26px; 
             display: flex; align-items: center; justify-content: center; 
             border: 2px solid white; z-index: 30; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             transition: transform 0.2s; cursor: pointer;
@@ -95,6 +95,33 @@
         </div>
     </div>
 
+    <!-- Article Editor Modal -->
+    <div id="article-modal" class="fixed inset-0 bg-black/80 z-[5000] items-center justify-center p-4 hidden">
+        <div class="bg-white p-6 md:p-8 rounded-[2.5rem] w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <button onclick="document.getElementById('article-modal').style.display='none'" class="absolute top-6 right-6 text-gray-400 hover:text-gray-900"><i data-lucide="x"></i></button>
+            <h3 class="text-2xl font-black mb-6 font-heading">Новая статья</h3>
+            
+            <p class="text-xs text-gray-500 mb-2 font-bold uppercase">Заголовок</p>
+            <input type="text" id="art-title" placeholder="Например: Дубай за копейки" class="w-full mb-4 p-4 bg-gray-50 rounded-2xl border border-transparent focus:border-brand-300 outline-none font-bold text-gray-900">
+            
+            <p class="text-xs text-gray-500 mb-2 font-bold uppercase">Тег (категория)</p>
+            <input type="text" id="art-tag" placeholder="Например: Лайфхак или Маршрут" class="w-full mb-4 p-4 bg-gray-50 rounded-2xl border border-transparent focus:border-brand-300 outline-none font-bold text-gray-900">
+            
+            <p class="text-xs text-gray-500 mb-2 font-bold uppercase">Краткое описание (для карточки)</p>
+            <input type="text" id="art-desc" placeholder="О чем статья в двух словах..." class="w-full mb-4 p-4 bg-gray-50 rounded-2xl border border-transparent focus:border-brand-300 outline-none font-bold text-gray-900">
+            
+            <p class="text-xs text-gray-500 mb-2 font-bold uppercase">Ссылка на красивое фото</p>
+            <input type="text" id="art-img" placeholder="https://..." class="w-full mb-4 p-4 bg-gray-50 rounded-2xl border border-transparent focus:border-brand-300 outline-none text-sm text-gray-900">
+            
+            <p class="text-xs text-gray-500 mb-2 font-bold uppercase">Текст статьи (разрешен HTML)</p>
+            <textarea id="art-content" placeholder="<h2>Введение</h2><p>Текст статьи...</p>" class="w-full mb-6 p-4 bg-gray-50 rounded-2xl border border-transparent focus:border-brand-300 outline-none text-sm text-gray-900 min-h-[150px]"></textarea>
+            
+            <button id="btn-save-article" onclick="window.saveNewArticle()" class="w-full py-4 bg-brand-600 text-white rounded-2xl font-black shadow-lg hover:bg-brand-700 transition-colors flex items-center justify-center gap-2">
+                ОПУБЛИКОВАТЬ
+            </button>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="glass-nav border-b border-gray-100/80 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 lg:h-20 flex justify-between items-center">
@@ -116,7 +143,7 @@
                 <div id="stories-scroll" class="flex items-center gap-5 overflow-x-auto no-scrollbar py-2">
                     <div id="add-story-circle" class="flex-shrink-0 flex flex-col items-center gap-1.5 cursor-pointer hidden" onclick="document.getElementById('hidden-file-input').click()">
                         <div class="w-16 h-16 rounded-full border-2 border-dashed border-brand-300 flex items-center justify-center bg-brand-50"><i data-lucide="plus" class="w-6 h-6 text-brand-500"></i></div>
-                        <span class="text-[10px] font-bold text-brand-500 uppercase tracking-tighter">Добавить</span>
+                        <span class="text-[10px] font-bold text-brand-500 uppercase tracking-tighter">История</span>
                     </div>
                     <div id="dynamic-stories" class="flex gap-5">
                         <div class="shimmer w-16 h-16 rounded-full flex-shrink-0"></div>
@@ -139,10 +166,7 @@
                         <button id="btnOneWay" onclick="window.toggleTripType('oneway')" class="trip-toggle px-6 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest transition-all">В одну сторону</button>
                     </div>
 
-                    <!-- Сетка полей -->
                     <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto] gap-3 items-center">
-                        
-                        <!-- Блок ОТКУДА -->
                         <div class="flex flex-col sm:flex-row gap-2 bg-gray-50 rounded-2xl p-2 border border-gray-100 focus-within:border-brand-300 transition-colors w-full">
                             <div class="relative flex-1">
                                 <div class="flex items-center px-3 h-full">
@@ -158,10 +182,8 @@
                             </div>
                         </div>
 
-                        <!-- Разделитель (на десктопе) -->
                         <div class="hidden md:block text-gray-300"><i data-lucide="arrow-right" class="w-5 h-5"></i></div>
 
-                        <!-- Блок КУДА -->
                         <div class="flex flex-col sm:flex-row gap-2 bg-gray-50 rounded-2xl p-2 border border-gray-100 focus-within:border-brand-300 transition-colors w-full">
                             <div class="relative flex-1">
                                 <div class="flex items-center px-3 h-full">
@@ -177,7 +199,6 @@
                             </div>
                         </div>
 
-                        <!-- Кнопка -->
                         <button onclick="window.searchFlights()" class="bg-brand-600 text-white px-8 py-4 rounded-2xl font-black hover:bg-brand-700 transition shadow-lg active:scale-95 w-full md:w-auto h-full flex items-center justify-center">
                             <i data-lucide="search" class="w-5 h-5 md:hidden mr-2"></i> НАЙТИ
                         </button>
@@ -201,37 +222,15 @@
             <div id="dealsGrid" class="scroll-container flex overflow-x-auto no-scrollbar gap-6 pb-8 px-2 text-left"></div>
         </section>
 
-        <!-- Guides Section -->
+        <!-- Guides Section (Тут теперь загружаются статьи из JSON) -->
         <section id="guides" class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-gray-900">
             <h2 class="text-2xl lg:text-3xl font-bold font-heading flex items-center gap-3 mb-10">
                 <div class="bg-brand-100 p-2.5 rounded-2xl text-brand-600"><i data-lucide="book-open"></i></div>
                 Путеводители и советы
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                <article onclick="window.openArticle('istanbul')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
-                    <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Стамбул"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-brand-600 uppercase">Маршрут</div></div>
-                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading">Стамбул за 3 дня</h3><p class="text-sm text-gray-500 line-clamp-2">Идеальный план для первого знакомства с городом.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>12 мая</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
-                </article>
-                <article onclick="window.openArticle('layovers')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
-                    <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Аэропорт"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-green-600 uppercase">Экономия</div></div>
-                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance">Длинные пересадки</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">Бесплатные отели от авиакомпаний и лучшие лаунжи.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>28 апр</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
-                </article>
-                <article onclick="window.openArticle('bali')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
-                    <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Бали"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-accent-600 uppercase">Лайфхак</div></div>
-                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance">Бали 2026: Новые правила</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">Все о визах, налогах и транспорте на острове.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>05 мая</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
-                </article>
-                <article onclick="window.openArticle('georgia')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
-                    <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover transition-transform duration-500" alt="Грузия"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-brand-600 uppercase">Маршрут</div></div>
-                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading">Грузия за неделю</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium text-balance">Логистика, еда и лучшие виды на Казбек.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>20 апр</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
-                </article>
-                <article onclick="window.openArticle('baggage')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
-                    <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1553531384-397c80973a0b?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Багаж"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-accent-600 uppercase">Лайфхак</div></div>
-                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading">Жизнь в 10 кг</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">Как упаковать всё необходимое в ручную кладь.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>15 апр</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
-                </article>
-                <article onclick="window.openArticle('maldives')" class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left">
-                    <div class="relative h-60 overflow-hidden"><img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover" alt="Мальдивы"><div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-green-600 uppercase">Экономия</div></div>
-                    <div class="p-8 flex-1 flex flex-col text-left"><h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading text-balance uppercase">Мальдивы за 100$</h3><p class="text-sm text-gray-500 line-clamp-2 font-medium">Райский отдых на локальных островах Мальдив.</p><div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest"><span>10 апр</span><span class="text-brand-600 font-bold">Читать →</span></div></div>
-                </article>
+            <!-- Динамическая сетка статей -->
+            <div id="guides-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <!-- Статьи появятся тут -->
             </div>
         </section>
 
@@ -248,10 +247,20 @@
     <!-- Admin Panel -->
     <div id="admin-panel">
         <div class="max-w-4xl mx-auto flex items-center justify-between text-gray-900">
-            <div><p class="font-black text-lg uppercase tracking-tight font-heading">Режим автора</p><p class="text-[10px] text-gray-400 font-bold uppercase">Загрузите контент в GitHub</p></div>
+            <div>
+                <p class="font-black text-lg uppercase tracking-tight font-heading">Режим автора</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase">Управление сайтом</p>
+            </div>
             <div class="flex items-center gap-3">
+                <!-- Кнопка "Добавить статью" -->
+                <button onclick="document.getElementById('article-modal').style.display='flex'" class="bg-indigo-100 text-indigo-600 px-4 py-3 rounded-2xl font-bold text-xs shadow-sm hover:bg-indigo-200 transition-all flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> СТАТЬЯ
+                </button>
+                <button onclick="window.resetDatabase()" class="bg-red-100 text-red-600 px-3 py-3 rounded-2xl font-bold text-xs shadow-sm hover:bg-red-200 transition-all flex items-center gap-2" title="Сброс историй">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
                 <label class="cursor-pointer bg-brand-600 text-white px-6 py-3 rounded-2xl font-black text-xs shadow-xl active:scale-95 flex items-center gap-2 transition-all">
-                    <i data-lucide="upload-cloud" class="w-4 h-4"></i> ВЫБРАТЬ ФАЙЛ
+                    <i data-lucide="camera" class="w-4 h-4"></i> ИСТОРИЯ
                     <input type="file" id="hidden-file-input" accept="image/*,video/*" class="hidden" onchange="window.handleFileUpload(this)">
                 </label>
                 <button onclick="window.toggleAdminPanel()" class="p-2 text-gray-400 hover:text-gray-900"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -263,14 +272,16 @@
         </div>
     </div>
 
-    <!-- Viewers -->
+    <!-- Article Reader View -->
     <div id="article-view" class="p-6">
         <div class="max-w-4xl mx-auto text-gray-900 text-left">
-            <button onclick="window.showView('home')" class="mb-8 font-bold flex items-center gap-2 text-brand-600 hover:text-brand-700 transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i> Назад</button>
+            <button onclick="window.showView('home')" class="mb-8 font-bold flex items-center gap-2 text-brand-600 hover:text-brand-700 transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i> Назад к поиску</button>
             <h1 id="article-title-view" class="text-3xl md:text-5xl font-black mb-10 leading-tight font-heading uppercase tracking-tighter"></h1>
             <div id="article-content-view" class="prose prose-blue max-w-none text-gray-700"></div>
         </div>
     </div>
+    
+    <!-- Story Viewer -->
     <div id="story-viewer" onclick="window.closeStory()">
         <div id="story-content" class="w-full h-full flex items-center justify-center p-2 text-white"></div>
     </div>
@@ -288,20 +299,22 @@
             GH_REPO: 'travelstories'
         };
 
-        const ARTICLES_DATA = {
-            istanbul: { title: "Стамбул за 3 дня", content: "<h2>Сердце Босфора</h2><p>Стамбул — это город контрастов...</p>" },
-            layovers: { title: "Длинные пересадки", content: "<h2>Искусство ожидания</h2><p>Как провести время в аэропорту...</p>" },
-            bali: { title: "Бали 2026", content: "<h2>Остров Богов</h2><p>Новые правила въезда...</p>" },
-            georgia: { title: "Грузия", content: "<h2>Душа Кавказа</h2><p>Гостеприимство и вино...</p>" },
-            baggage: { title: "Ручная кладь", content: "<h2>Легкость</h2><p>Как упаковать всё в 10 кг...</p>" },
-            maldives: { title: "Мальдивы", content: "<h2>Рай доступен</h2><p>Бюджетный отдых...</p>" }
-        };
+        // Базовые статьи (показываются, если файла на GitHub еще нет)
+        const DEFAULT_ARTICLES = [
+            { id: "istanbul", title: "Стамбул за 3 дня", tag: "Маршрут", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=800", desc: "Идеальный план для первого знакомства с городом.", date: "12 мая", content: "<h2>Сердце Босфора</h2><p>Стамбул — это город контрастов...</p>" },
+            { id: "layovers", title: "Длинные пересадки", tag: "Экономия", image: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?auto=format&fit=crop&q=80&w=800", desc: "Бесплатные отели от авиакомпаний и лучшие лаунжи.", date: "28 апр", content: "<h2>Искусство ожидания</h2><p>Как провести время в аэропорту...</p>" },
+            { id: "bali", title: "Бали 2026: Новые правила", tag: "Лайфхак", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800", desc: "Все о визах, налогах и транспорте на острове.", date: "05 мая", content: "<h2>Остров Богов</h2><p>Новые правила въезда...</p>" },
+            { id: "georgia", title: "Грузия за неделю", tag: "Маршрут", image: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&q=80&w=800", desc: "Логистика, еда и лучшие виды на Казбек.", date: "20 апр", content: "<h2>Душа Кавказа</h2><p>Гостеприимство и вино...</p>" },
+            { id: "baggage", title: "Жизнь в 10 кг", tag: "Лайфхак", image: "https://images.unsplash.com/photo-1553531384-397c80973a0b?auto=format&fit=crop&q=80&w=800", desc: "Как упаковать всё необходимое в ручную кладь.", date: "15 апр", content: "<h2>Легкость</h2><p>Как упаковать всё в 10 кг...</p>" },
+            { id: "maldives", title: "Мальдивы за 100$", tag: "Экономия", image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&q=80&w=800", desc: "Райский отдых на локальных островах Мальдив.", date: "10 апр", content: "<h2>Рай доступен</h2><p>Бюджетный отдых...</p>" }
+        ];
 
         const CITY_NAMES = { 'MOW': 'Москва', 'LED': 'Санкт-Петербург', 'IST': 'Стамбул', 'DXB': 'Дубай', 'HKT': 'Пхукет', 'DPS': 'Бали', 'TBS': 'Тбилиси' };
         
         let githubToken = localStorage.getItem('gh_token');
         let selectedFromCode = '';
         let selectedToCode = '';
+        window.currentArticles = []; // Глобальное хранилище текущих статей
 
         // --- ENCODING HELPERS (UTF-8 SAFE) ---
         function toBase64(str) {
@@ -309,7 +322,7 @@
         }
 
         function fromBase64(str) {
-            return new TextDecoder().decode(Uint8Array.from(atob(str), c => c.charCodeAt(0)));
+            try { return new TextDecoder().decode(Uint8Array.from(atob(str), c => c.charCodeAt(0))); } catch(e) { return "[]"; }
         }
 
         function formatASDate(d) {
@@ -333,7 +346,164 @@
             }
         }
 
-        // --- GITHUB API STORAGE ---
+        // ==========================================
+        //         ЛОГИКА ДЛЯ СТАТЕЙ (ПУТЕВОДИТЕЛЕЙ)
+        // ==========================================
+        
+        async function loadGithubArticles() {
+            try {
+                const url = githubToken ? `https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/articles.json` : `https://raw.githubusercontent.com/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/main/articles.json?t=${Date.now()}`;
+                const headers = githubToken ? { 'Authorization': `Bearer ${githubToken}`, 'Accept': 'application/vnd.github.v3+json' } : {};
+                const res = await fetchWithTimeout(url, { headers });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    let articles = [];
+                    if (githubToken && data.content) {
+                        articles = JSON.parse(fromBase64(data.content.replace(/\n/g, '')));
+                    } else if (!githubToken) {
+                        articles = data;
+                    }
+                    window.currentArticles = Array.isArray(articles) && articles.length > 0 ? articles : DEFAULT_ARTICLES;
+                } else {
+                    window.currentArticles = DEFAULT_ARTICLES;
+                }
+                renderGuides(window.currentArticles);
+            } catch(e) {
+                window.currentArticles = DEFAULT_ARTICLES;
+                renderGuides(window.currentArticles);
+            }
+        }
+
+        function renderGuides(articles) {
+            const container = document.getElementById('guides-grid');
+            const isAuthorMode = !document.getElementById('add-story-circle').classList.contains('hidden');
+            
+            container.innerHTML = articles.map(a => `
+                <article class="article-card group bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 flex flex-col cursor-pointer text-left relative" onclick="window.openArticle('${a.id}')">
+                    ${isAuthorMode ? `<button class="delete-btn" onclick="window.deleteArticle(event, '${a.id}')" title="Удалить статью"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : ''}
+                    <div class="relative h-60 overflow-hidden"><img src="${a.image}" class="w-full h-full object-cover transition-transform duration-500" alt="${a.title}">
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-brand-600 uppercase">${a.tag}</div>
+                    </div>
+                    <div class="p-8 flex-1 flex flex-col text-left">
+                        <h3 class="font-bold text-xl mb-3 group-hover:text-brand-600 transition leading-tight text-gray-900 font-heading">${a.title}</h3>
+                        <p class="text-sm text-gray-500 line-clamp-2 font-medium">${a.desc}</p>
+                        <div class="mt-auto pt-6 flex justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                            <span>${a.date}</span><span class="text-brand-600 font-bold">Читать →</span>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.openArticle = (id) => {
+            const d = window.currentArticles.find(x => x.id === id);
+            if (d) {
+                document.getElementById('article-title-view').innerText = d.title;
+                document.getElementById('article-content-view').innerHTML = d.content;
+                window.showView('article');
+                lucide.createIcons();
+            }
+        };
+
+        window.saveNewArticle = async () => {
+            const title = document.getElementById('art-title').value.trim();
+            const tag = document.getElementById('art-tag').value.trim();
+            const desc = document.getElementById('art-desc').value.trim();
+            const image = document.getElementById('art-img').value.trim();
+            const content = document.getElementById('art-content').value.trim();
+
+            if (!title || !image || !content) return alert("Заполните заголовок, ссылку на фото и текст.");
+            if (!githubToken) return alert("Токен не найден.");
+
+            const btn = document.getElementById('btn-save-article');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>';
+            btn.disabled = true;
+
+            const newArticle = {
+                id: 'art_' + Date.now(),
+                title: title,
+                tag: tag || "Статья",
+                desc: desc || title,
+                image: image,
+                date: new Date().toLocaleDateString('ru-RU', {day: 'numeric', month: 'short'}),
+                content: content
+            };
+
+            try {
+                let sha = null;
+                let articles = [...window.currentArticles]; // Берем текущие
+
+                try {
+                    const r = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/articles.json`, { headers: { 'Authorization': `Bearer ${githubToken}` } });
+                    if(r.ok) { const d = await r.json(); sha = d.sha; }
+                } catch(e){}
+
+                // Добавляем новую статью в начало
+                articles.unshift(newArticle);
+
+                const res = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/articles.json`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${githubToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `Add article ${title}`, content: toBase64(JSON.stringify(articles)), sha: sha, branch: 'main' })
+                });
+
+                if(!res.ok) throw new Error("Не удалось сохранить");
+                
+                alert("Статья опубликована!");
+                document.getElementById('article-modal').style.display = 'none';
+                loadGithubArticles(); // Перерисовываем
+
+                // Очищаем форму
+                document.getElementById('art-title').value = '';
+                document.getElementById('art-desc').value = '';
+                document.getElementById('art-img').value = '';
+                document.getElementById('art-content').value = '';
+
+            } catch(e) {
+                alert("Ошибка: " + e.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        window.deleteArticle = async (event, id) => {
+            event.preventDefault(); event.stopPropagation();
+            if (!confirm("Удалить статью навсегда?")) return;
+            if (!githubToken) return;
+
+            const btn = event.currentTarget;
+            btn.innerHTML = '<div class="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>';
+
+            try {
+                const r = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/articles.json`, { headers: { 'Authorization': `Bearer ${githubToken}` } });
+                if(!r.ok) throw new Error("Не удалось прочитать");
+                const d = await r.json();
+                
+                let articles = JSON.parse(fromBase64(d.content.replace(/\n/g, '')));
+                articles = articles.filter(a => a.id !== id);
+
+                const res = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/articles.json`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${githubToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `Delete article`, content: toBase64(JSON.stringify(articles)), sha: d.sha, branch: 'main' })
+                });
+
+                if(!res.ok) throw new Error("Ошибка при удалении");
+                loadGithubArticles();
+            } catch(e) {
+                alert("Ошибка: " + e.message);
+                lucide.createIcons();
+            }
+        };
+
+        // ==========================================
+        //              ЛОГИКА ИСТОРИЙ
+        // ==========================================
+
         async function loadGithubStories() {
             try {
                 const url = githubToken 
@@ -349,35 +519,25 @@
                     if (githubToken) {
                         const data = await res.json();
                         if (data.content && data.content.trim().length > 0) {
-                            try {
-                                const cleanContent = data.content.replace(/\n/g, '');
-                                stories = JSON.parse(fromBase64(cleanContent));
-                            } catch (e) {
-                                console.warn("API Content Decode Error:", e);
-                            }
+                            try { stories = JSON.parse(fromBase64(data.content.replace(/\n/g, ''))); } catch (e) {}
                         }
                     } else {
                         const text = await res.text();
                         if (text && text.trim().length > 0) {
-                            try {
-                                stories = JSON.parse(text);
-                            } catch (e) {
-                                console.warn("Raw JSON Parse Error:", e);
-                            }
+                            try { stories = JSON.parse(text); } catch (e) {}
                         }
                     }
-                    renderStoriesUI(stories.sort((a,b) => b.timestamp - a.timestamp));
+                    renderStoriesUI(Array.isArray(stories) ? stories.sort((a,b) => b.timestamp - a.timestamp) : []);
                 } else {
                     renderStoriesUI([]);
                 }
             } catch (e) { 
-                console.error("GH Load error:", e); 
                 renderStoriesUI([]); 
             }
         }
 
         async function uploadToGithub(file) {
-            if (!githubToken) { alert("Токен не найден. Перезайдите."); return; }
+            if (!githubToken) { alert("Токен не найден."); return; }
             
             const statusLabel = document.getElementById('status-label');
             const timestamp = Date.now();
@@ -392,91 +552,48 @@
                     reader.readAsDataURL(file);
                 });
 
-                // 1. Загрузка файла картинки
-                statusLabel.innerText = "Загрузка на GitHub...";
+                statusLabel.innerText = "Загрузка фото...";
                 const putRes = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/${filename}`, {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${githubToken}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        message: `Add story ${timestamp}`,
-                        content: contentBase64,
-                        branch: 'main'
-                    })
+                    headers: { 'Authorization': `Bearer ${githubToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `Add story`, content: contentBase64, branch: 'main' })
                 });
 
-                if (putRes.status === 404) throw new Error(`Репозиторий '${CONFIG.GH_REPO}' не найден!`);
-                if (!putRes.ok) {
-                   const errData = await putRes.json();
-                   throw new Error(`GitHub Upload: ${errData.message}`);
-                }
+                if (!putRes.ok) throw new Error("Сбой загрузки картинки");
 
-                // 2. Обновление индекса историй (stories.json)
                 statusLabel.innerText = "Обновление базы...";
                 let stories = [];
                 let sha = null;
                 
                 try {
-                    const getRes = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, {
-                        headers: { 
-                            'Authorization': `Bearer ${githubToken}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
+                    const getRes = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, { headers: { 'Authorization': `Bearer ${githubToken}` }});
                     if (getRes.ok) {
                         const getData = await getRes.json();
-                        if (getData.content) {
-                            try {
-                                const cleanContent = getData.content.replace(/\n/g, '');
-                                stories = JSON.parse(fromBase64(cleanContent));
-                            } catch (e) { console.warn("Stories file corrupt, creating new."); }
-                        }
+                        if (getData.content) stories = JSON.parse(fromBase64(getData.content.replace(/\n/g, '')));
                         sha = getData.sha;
                     }
                 } catch (e) {}
 
-                const publicUrl = `https://raw.githubusercontent.com/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/main/${filename}`;
-                stories.push({
-                    url: publicUrl,
-                    type: file.type.startsWith('video') ? 'video' : 'image',
-                    timestamp: timestamp
-                });
+                if (!Array.isArray(stories)) stories = [];
 
-                const newContentBase64 = toBase64(JSON.stringify(stories));
-                
-                const bodyPayload = {
-                    message: `Update stories index`,
-                    content: newContentBase64,
-                    branch: 'main'
-                };
-                if (sha) bodyPayload.sha = sha;
+                const publicUrl = `https://raw.githubusercontent.com/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/main/${filename}`;
+                stories.push({ url: publicUrl, type: file.type.startsWith('video') ? 'video' : 'image', timestamp: timestamp });
 
                 const updateRes = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${githubToken}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify(bodyPayload)
+                    headers: { 'Authorization': `Bearer ${githubToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `Update index`, content: toBase64(JSON.stringify(stories)), branch: 'main', sha: sha })
                 });
 
-                if (!updateRes.ok) {
-                    const errData = await updateRes.json();
-                    throw new Error(`GitHub Index Update: ${errData.message}`);
-                }
+                if (!updateRes.ok) throw new Error("Ошибка обновления списка");
 
                 document.getElementById('upload-status').classList.add('hidden');
                 window.toggleAdminPanel();
-                alert("Успешно! История появится через 1-2 минуты.");
-                loadGithubStories(); // Обновить локально
+                alert("Успешно!");
+                loadGithubStories();
                 
             } catch (e) {
-                console.error(e);
-                alert("Ошибка: " + e.message);
+                alert(e.message);
                 document.getElementById('upload-status').classList.add('hidden');
             }
         }
@@ -484,32 +601,43 @@
         window.deleteStory = async (event, timestamp) => {
             if (event) { event.preventDefault(); event.stopPropagation(); }
             if (!confirm("Удалить историю?")) return;
-            if (!githubToken) { alert("Нужен токен автора"); return; }
+            if (!githubToken) return;
+            const btn = event.currentTarget;
+            btn.innerHTML = '<div class="animate-spin w-3 h-3 border-2 border-white border-t-transparent rounded-full"></div>';
             
             try {
-                const getRes = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, {
-                    headers: { 'Authorization': `Bearer ${githubToken}`, 'Accept': 'application/vnd.github.v3+json' }
-                });
-                
-                if (!getRes.ok) throw new Error("Ошибка чтения базы");
+                const getRes = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, { headers: { 'Authorization': `Bearer ${githubToken}` }});
+                if (!getRes.ok) throw new Error("Ошибка чтения");
                 const getData = await getRes.json();
                 let stories = JSON.parse(fromBase64(getData.content.replace(/\n/g, '')));
                 const newStories = stories.filter(s => s.timestamp !== timestamp);
-                const newContentBase64 = toBase64(JSON.stringify(newStories));
                 
                 const updateRes = await fetchWithTimeout(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, {
                     method: 'PUT',
                     headers: { 'Authorization': `Bearer ${githubToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: `Delete story`, content: newContentBase64, sha: getData.sha, branch: 'main' })
+                    body: JSON.stringify({ message: `Delete story`, content: toBase64(JSON.stringify(newStories)), sha: getData.sha, branch: 'main' })
                 });
-
                 if (!updateRes.ok) throw new Error("Ошибка удаления");
-                alert("Удалено!");
                 loadGithubStories();
-            } catch (e) { alert(e.message); }
+            } catch (e) { alert(e.message); lucide.createIcons(); }
         };
 
-        // --- UI HANDLERS ---
+        window.resetDatabase = async () => {
+            if(!confirm("Удалить ВСЕ истории?")) return;
+            try {
+                let sha = null;
+                const r = await fetch(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, { headers: { 'Authorization': `Bearer ${githubToken}` } });
+                if(r.ok) sha = (await r.json()).sha;
+                await fetch(`https://api.github.com/repos/${CONFIG.GH_USER}/${CONFIG.GH_REPO}/contents/stories.json`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${githubToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Reset", content: toBase64("[]"), branch: 'main', sha: sha })
+                });
+                loadGithubStories();
+            } catch(e) {}
+        };
+
+        // --- УПРАВЛЕНИЕ ИНТЕРФЕЙСОМ ---
         window.openAuth = () => document.getElementById('auth-modal').style.display = 'flex';
         window.closeAuth = () => document.getElementById('auth-modal').style.display = 'none';
         
@@ -521,8 +649,8 @@
                 window.closeAuth();
                 document.getElementById('add-story-circle').classList.remove('hidden');
                 document.getElementById('admin-panel').style.display = 'block';
-                document.getElementById('stories-section').scrollIntoView({ behavior: 'smooth' });
                 loadGithubStories();
+                loadGithubArticles(); // Чтобы появились крестики удаления статей
             } else { alert("Неверный PIN"); }
         };
 
@@ -543,15 +671,7 @@
             document.getElementById('article-view').style.display = view === 'article' ? 'block' : 'none';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
-        window.openArticle = (id) => {
-            const d = ARTICLES_DATA[id];
-            if (d) {
-                document.getElementById('article-title-view').innerText = d.title;
-                document.getElementById('article-content-view').innerHTML = d.content;
-                window.showView('article');
-                lucide.createIcons();
-            }
-        };
+
         window.scrollDeals = (dir) => document.getElementById('dealsGrid').scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
         window.viewStory = (url, type) => {
             document.getElementById('story-viewer').style.display = 'flex';
@@ -564,7 +684,7 @@
              document.getElementById('returnDateContainer').style.display = type === 'oneway' ? 'none' : 'flex';
         };
         
-        // --- SEARCH LOGIC (FIXED) ---
+        // --- ПОИСК БИЛЕТОВ ---
         window.handleAutocompleteInput = (e, type) => {
             const term = e.target.value;
             const list = document.getElementById(type === 'from' ? 'autocompleteFrom' : 'autocompleteTo');
@@ -594,7 +714,6 @@
         window.searchFlights = () => {
             const d1 = formatASDate(document.getElementById('inputDateDepart').value);
             const d2 = formatASDate(document.getElementById('inputDateReturn').value);
-            // Если коды не выбраны (пользователь ввел вручную), пробуем искать по имени или просто не пускаем (лучше полагаться на выбор)
             if (selectedFromCode && selectedToCode) {
                  window.open(`https://www.aviasales.ru/search/${selectedFromCode}${d1}${selectedToCode}${d2}1?marker=${CONFIG.MARKER}`, '_blank');
             } else {
@@ -604,7 +723,7 @@
         
         function renderStoriesUI(stories) { 
             const container = document.getElementById('dynamic-stories');
-            if (stories.length === 0) {
+            if (!stories || stories.length === 0) {
                 container.innerHTML = '<span class="text-[10px] text-gray-300 font-bold py-6 uppercase tracking-widest italic">Нет историй</span>';
                 return;
             }
@@ -626,35 +745,26 @@
         window.onload = () => {
             lucide.createIcons();
             loadGithubStories();
+            loadGithubArticles(); // Загружаем статьи
             
-            // --- НАСТРОЙКА КАЛЕНДАРЯ (БЛОКИРОВКА ПРОШЛОГО) ---
+            // --- КАЛЕНДАРЬ ---
             const dateDepart = document.getElementById('inputDateDepart');
             const dateReturn = document.getElementById('inputDateReturn');
-            
             const today = new Date();
-            const todayStr = today.toISOString().split('T')[0]; // Формат YYYY-MM-DD
+            const todayStr = today.toISOString().split('T')[0];
             
-            // 1. Блокируем прошедшие даты
             dateDepart.min = todayStr;
             dateReturn.min = todayStr;
-            
-            // 2. Устанавливаем начальные значения
             dateDepart.value = todayStr;
-            
-            const weekLater = new Date(); 
-            weekLater.setDate(today.getDate() + 7);
+            const weekLater = new Date(); weekLater.setDate(today.getDate() + 7);
             dateReturn.value = weekLater.toISOString().split('T')[0];
 
-            // 3. Логика: дата возврата не может быть раньше даты вылета
             dateDepart.addEventListener('change', function() {
                 dateReturn.min = this.value;
-                // Если выбранная дата возврата стала меньше новой даты вылета, сдвигаем её
-                if (dateReturn.value < this.value) {
-                    dateReturn.value = this.value;
-                }
+                if (dateReturn.value < this.value) dateReturn.value = this.value;
             });
-            // ---------------------------------------------------
             
+            // --- БИЛЕТЫ ---
             fetch(`${CONFIG.API_BASE}/v2/prices/latest?currency=rub&limit=8&token=${CONFIG.TOKEN}`)
                 .then(r => r.json())
                 .then(d => {
